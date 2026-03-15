@@ -9,8 +9,6 @@
 <br>
 <div>
     <img alt="C++" src="https://img.shields.io/badge/C++-20-%2300599C?logo=cplusplus">
-</div>
-<div>
     <img alt="platform" src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-blueviolet">
 </div>
 <div>
@@ -24,7 +22,9 @@
 <div>
     <a href="https://deepwiki.com/MaaAssistantArknights/MaaAssistantArknights"><img src="https://deepwiki.com/badge.svg" alt="Ask DeepWiki"></a>
 </div>
-<a href="https://trendshift.io/repositories/979" target="_blank"><img src="https://trendshift.io/api/badge/repositories/979" alt="MaaAssistantArknights%2FMaaAssistantArknights | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
+    <a href="https://trendshift.io/repositories/979" target="_blank"><img src="https://trendshift.io/api/badge/repositories/979" alt="MaaAssistantArknights%2FMaaAssistantArknights | Trendshift" width="250" height="55"/></a>
+<div>
+</div>
 <br>
 
 <!-- markdownlint-restore -->
