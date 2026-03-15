@@ -42,8 +42,12 @@ We've preset several different development environments for you to choose from:
 3. Clone the dev branch of your repository with submodules:
 
    ```bash
-   git clone --recurse-submodules <your repository link> -b dev-v2
+   git clone --recurse-submodules <your repository link> -b dev-v2 --single-branch
    ```
+
+   ::: tip
+   `--single-branch` only fetches the history for `dev-v2`. If you later want to switch to another branch, run `git remote set-branches origin '*'` and fetch again so Git can download the missing branch data, or re-clone the repository without `--single-branch`.
+   :::
 
    ::: warning
    If using Git GUI clients like Visual Studio without `--recurse-submodules` support, run `git submodule update --init` after cloning to initialize submodules.
