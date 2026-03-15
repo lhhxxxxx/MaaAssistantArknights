@@ -12,7 +12,7 @@
 
 ### 修复 | Fix
 
-* 地图解析时code为null会崩溃 @status102
+* 地图解析时 code 为 null 会崩溃 @status102
 * 地图判断不再允许 空值与非空值 => true @status102
 * 仅在刷源石锭模式下允许触发储备源石锭达到上限时停止 @ABA2396
 
@@ -20,6 +20,10 @@
 
 * Add inline styles to Trendshift badge @AnnAngela
 * Update README.md badge formatting and structure @AnnAngela
-* Reapply "fix: overview is null" @status102
-* Revert "fix: overview is null" @status102
-* Revert "fix: 改个地图code默认值" @status102
+
+## v6.5.0
+
+### 新增 | New
+
+* 卫二期 @ABA2396
+* 调整提示文本 @ABA2396
