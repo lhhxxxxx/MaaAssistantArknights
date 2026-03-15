@@ -113,6 +113,8 @@
     <system:String x:Key="GuideOpenSourceTitle">💡 參與開源</system:String>
     <system:String x:Key="GuideOpenSourceDescription">作為開源專案，使用者可依據 AGPL-3.0 許可證在 GitHub 平台參與 MAA 的開發。MAA Team 鼓勵使用者透過更有價值的程式碼貢獻代替問題回饋。</system:String>
     <system:String x:Key="GuideUserAgreement">使用 MAA 即表示您同意遵守「用戶協議」，完整協議內容可在官網底部的連結中查看。</system:String>
+    <system:String x:Key="RestartGuide">重看設定指引</system:String>
+    <system:String x:Key="RestartGuidePrompt">設定指引將在主介面顯示，是否立即重啟應用程式？</system:String>
     <!--  !設定指引  -->
     <system:String x:Key="Dorm">宿舍</system:String>
     <system:String x:Key="Mfg">製造站</system:String>
