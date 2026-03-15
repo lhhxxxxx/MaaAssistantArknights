@@ -162,12 +162,16 @@
                                             IsChecked="{Binding AutoDetectConnection}" />
                                         <controls:TooltipBlock TooltipText="{DynamicResource AutoDetectConnectionTip}" />
                                     </StackPanel>
-                                    <CheckBox
-                                        Margin="0,10"
-                                        HorizontalAlignment="Left"
-                                        Content="{DynamicResource AlwaysAutoDetectConnection}"
-                                        IsChecked="{Binding AlwaysAutoDetectConnection}"
-                                        Visibility="{c:Binding AutoDetectConnection}" />
+                                    <StackPanel HorizontalAlignment="Left" Orientation="Horizontal">
+                                        <CheckBox
+                                            Margin="0,10"
+                                            HorizontalAlignment="Left"
+                                            Content="{DynamicResource AlwaysAutoDetectConnection}"
+                                            IsChecked="{Binding AlwaysAutoDetectConnection}"
+                                            Style="{StaticResource ErrorHighlightCheckBoxStyle}"
+                                            Visibility="{c:Binding AutoDetectConnection}" />
+                                        <controls:TooltipBlock TooltipText="{DynamicResource AlwaysAutoDetectConnectionTip}" />
+                                    </StackPanel>
                                 </StackPanel>
 
                                 <!--  连接配置  -->

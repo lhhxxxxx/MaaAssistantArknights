@@ -15,15 +15,9 @@ struct LevelKey
     std::string levelId;
     std::string name;
 
-    bool empty_or_equal(const std::string& lhs, const std::string& rhs) const noexcept
-    {
-        return (lhs.empty() || rhs.empty()) ? true : lhs == rhs;
-    }
-
     bool operator==(const LevelKey& other) const noexcept
     {
-        return empty_or_equal(stageId, other.stageId) && empty_or_equal(code, other.code)
-               && empty_or_equal(levelId, other.levelId) && empty_or_equal(name, other.name);
+        return stageId == other.stageId && code == other.code && levelId == other.levelId && name == other.name;
     }
 
     bool operator==(const std::string& any_key) const noexcept
@@ -31,8 +25,7 @@ struct LevelKey
         if (any_key.empty()) {
             return false;
         }
-        return empty_or_equal(stageId, any_key) || empty_or_equal(code, any_key)
-               || empty_or_equal(levelId, any_key) || empty_or_equal(name, any_key);
+        return stageId == any_key || code == any_key || levelId == any_key || name == any_key;
     }
 };
 
@@ -67,7 +60,7 @@ private:
 inline Level::Level(const json::value& data)
 {
     key.stageId = data.at("stageId").as_string();
-    key.code = data.at("code").as_string();
+    key.code = data.get("code", "null");
     key.levelId = data.at("levelId").as_string();
     key.name = data.get("name", "null");
     this->height = data.at("height").as_integer();
@@ -84,9 +77,10 @@ inline Level::Level(const json::value& data)
         std::vector<Tile> tmp;
         tmp.reserve(this->width);
         for (const json::value& tile : row.as_array()) {
-            tmp.emplace_back(Tile { tile.at("heightType").as_integer(),
-                                    tile.at("buildableType").as_integer(),
-                                    tile.get("tileKey", std::string()) });
+            tmp.emplace_back(
+                Tile { tile.at("heightType").as_integer(),
+                       tile.at("buildableType").as_integer(),
+                       tile.get("tileKey", std::string()) });
         }
         tiles.emplace_back(std::move(tmp));
     }

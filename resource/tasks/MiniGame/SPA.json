@@ -128,6 +128,6 @@
         "doc": "二期新加的允许中断返回",
         "action": "ClickSelf",
         "roi": [717, 573, 242, 141],
-        "next": ["MiniGame@SPA@ConfirmResult"]
+        "next": ["#self", "MiniGame@SPA@ConfirmResult"]
     }
 }

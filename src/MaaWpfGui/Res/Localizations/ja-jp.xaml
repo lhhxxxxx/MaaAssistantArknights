@@ -113,6 +113,8 @@
     <system:String x:Key="GuideOpenSourceTitle">💡 オープンソースへの参加</system:String>
     <system:String x:Key="GuideOpenSourceDescription">オープンソースプロジェクトとして、ユーザーは AGPL-3.0 ライセンスの下で GitHub プラットフォーム上で MAA の開発に参加できます。MAA Team は、問題報告の代わりに価値あるコード貢献をすることを推奨しています。</system:String>
     <system:String x:Key="GuideUserAgreement">MAA を使用することにより、「利用規約」に同意したものとみなされます。完全な規約は、公式サイトの下部のリンクからご覧いただけます。</system:String>
+    <system:String x:Key="RestartGuide">設定ガイドを再表示</system:String>
+    <system:String x:Key="RestartGuidePrompt">設定ガイドはメイン画面に表示されます。今すぐアプリケーションを再起動しますか？</system:String>
     <!--  !設定ガイド  -->
     <system:String x:Key="Dorm">宿舎</system:String>
     <system:String x:Key="Mfg">製造所</system:String>

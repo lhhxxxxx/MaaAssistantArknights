@@ -631,6 +631,23 @@ public class SettingsViewModel : Screen
         GuideStepIndex = GuideMaxStep;
     }
 
+    // UI 绑定的方法
+    [UsedImplicitly]
+    public void RestartGuide()
+    {
+        GuideStepIndex = 0;
+        TaskSettingVisibilities.Guide = true;
+        var result = MessageBoxHelper.Show(
+            LocalizationHelper.GetString("RestartGuidePrompt"),
+            LocalizationHelper.GetString("Tip"),
+            MessageBoxButton.OKCancel,
+            MessageBoxImage.Question);
+        if (result == MessageBoxResult.OK)
+        {
+            Bootstrapper.ShutdownAndRestartWithoutArgs();
+        }
+    }
+
     #endregion SettingsGuide
 
     #region 设置页面列表和滚动视图联动绑定

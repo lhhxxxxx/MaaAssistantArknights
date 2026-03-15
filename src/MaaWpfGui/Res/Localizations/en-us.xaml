@@ -113,6 +113,8 @@
     <system:String x:Key="GuideOpenSourceTitle">💡 Participate in Open Source</system:String>
     <system:String x:Key="GuideOpenSourceDescription">As an open source project, users can participate in MAA's development on GitHub platform under the AGPL-3.0 license. MAA Team encourages users to contribute valuable code instead of just reporting issues.</system:String>
     <system:String x:Key="GuideUserAgreement">By using MAA, you agree to comply with the "User Agreement". The complete agreement can be found in the link at the bottom of the official website.</system:String>
+    <system:String x:Key="RestartGuide">Restart Settings Guide</system:String>
+    <system:String x:Key="RestartGuidePrompt">The settings guide will be displayed on the main interface. Restart the application now?</system:String>
     <!--  !Settings Guide  -->
     <system:String x:Key="Dorm">Dormitory</system:String>
     <system:String x:Key="Mfg">Factory</system:String>
