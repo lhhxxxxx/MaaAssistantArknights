@@ -15,9 +15,28 @@ struct LevelKey
     std::string levelId;
     std::string name;
 
+    bool empty_or_equal(const std::string& lhs, const std::string& rhs) const noexcept
+    {
+        return (lhs.empty() || rhs.empty()) ? true : lhs == rhs;
+    }
+
+    bool check_and_track(const std::string& lhs, const std::string& rhs, bool& matched) const noexcept
+    {
+        if (!lhs.empty() && !rhs.empty()) {
+            if (lhs != rhs) return false;
+            matched = true;
+        }
+        return true;
+    }
+
     bool operator==(const LevelKey& other) const noexcept
     {
-        return stageId == other.stageId && code == other.code && levelId == other.levelId && name == other.name;
+        bool has_non_empty_match = false;
+        return check_and_track(stageId, other.stageId, has_non_empty_match)
+            && check_and_track(code, other.code, has_non_empty_match)
+            && check_and_track(levelId, other.levelId, has_non_empty_match)
+            && check_and_track(name, other.name, has_non_empty_match)
+            && has_non_empty_match;
     }
 
     bool operator==(const std::string& any_key) const noexcept
@@ -25,7 +44,8 @@ struct LevelKey
         if (any_key.empty()) {
             return false;
         }
-        return stageId == any_key || code == any_key || levelId == any_key || name == any_key;
+        return empty_or_equal(stageId, any_key) || empty_or_equal(code, any_key)
+               || empty_or_equal(levelId, any_key) || empty_or_equal(name, any_key);
     }
 };
 
@@ -77,10 +97,9 @@ inline Level::Level(const json::value& data)
         std::vector<Tile> tmp;
         tmp.reserve(this->width);
         for (const json::value& tile : row.as_array()) {
-            tmp.emplace_back(
-                Tile { tile.at("heightType").as_integer(),
-                       tile.at("buildableType").as_integer(),
-                       tile.get("tileKey", std::string()) });
+            tmp.emplace_back(Tile { tile.at("heightType").as_integer(),
+                                    tile.at("buildableType").as_integer(),
+                                    tile.get("tileKey", std::string()) });
         }
         tiles.emplace_back(std::move(tmp));
     }
