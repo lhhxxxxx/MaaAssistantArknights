@@ -574,7 +574,7 @@
                                         Grid.Column="1"
                                         Margin="0"
                                         Padding="5,6"
-                                        hc:IconElement.Geometry="{StaticResource ConfigGeometry}"
+                                        hc:IconElement.Geometry="{StaticResource CopilotListItemToParse}"
                                         hc:VisualElement.HighlightBackground="Transparent"
                                         hc:VisualElement.HighlightForeground="{DynamicResource PrimaryBrush}"
                                         Background="Transparent"
