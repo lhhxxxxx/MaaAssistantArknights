@@ -660,7 +660,6 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
     public static string? GetFightStage(IEnumerable<string> list)
     {
         var stage = list?.FirstOrDefault(s => Instances.StageManager.IsStageOpen(s, Instances.TaskQueueViewModel.CurDayOfWeek));
-        stage ??= list?.FirstOrDefault();
         _logger.Information("GetFightStage: from {list}, selected {stage}", list, stage);
         return stage;
     }
