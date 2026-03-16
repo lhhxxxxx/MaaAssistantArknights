@@ -69,6 +69,11 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
     public static FightSettingsUserControlModel Instance { get; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether a stage plan item is being dragged.
+    /// </summary>
+    public bool IsDragging { get => field; set => SetAndNotify(ref field, value); }
+
+    /// <summary>
     /// Gets or private sets the list of stages.
     /// </summary>
     public ObservableCollection<StageSourceItem> StageListSource { get => field; private set => SetAndNotify(ref field, value); } = [];

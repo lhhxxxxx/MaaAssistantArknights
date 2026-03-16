@@ -310,6 +310,8 @@
                                     <TextBox
                                         Height="30"
                                         hc:InfoElement.Placeholder="{DynamicResource DefaultStage}"
+                                        IsEnabled="{c:Binding !IsDragging,
+                                                              Source={x:Static ui_vms:TaskQueueViewModel.FightTask}}"
                                         Opacity="{c:Binding 'IsOpen ? 1 : 0.5'}"
                                         Text="{Binding Stage, UpdateSourceTrigger=PropertyChanged}"
                                         ToolTip="{DynamicResource CustomStageCodeTip}"
@@ -348,7 +350,9 @@
                                             hc:VisualElement.HighlightBackground="Transparent"
                                             Background="Transparent"
                                             BorderThickness="0"
-                                            Cursor="Hand" />
+                                            Cursor="Hand"
+                                            PreviewMouseLeftButtonDown="DragHandle_PreviewMouseLeftButtonDown"
+                                            PreviewMouseLeftButtonUp="DragHandle_PreviewMouseLeftButtonUp" />
                                         <!--  删除按钮  -->
                                         <Button
                                             Grid.Column="1"
