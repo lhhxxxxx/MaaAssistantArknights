@@ -22,8 +22,10 @@ struct LevelKey
 
     bool check_and_track(const std::string& lhs, const std::string& rhs, bool& matched) const noexcept
     {
-        if (!lhs.empty() && !rhs.empty()) {
-            if (lhs != rhs) return false;
+        if (!rhs.empty()) {
+            if (lhs != rhs) {
+                return false;
+            }
             matched = true;
         }
         return true;
@@ -32,11 +34,10 @@ struct LevelKey
     bool operator==(const LevelKey& other) const noexcept
     {
         bool has_non_empty_match = false;
-        return check_and_track(stageId, other.stageId, has_non_empty_match)
-            && check_and_track(code, other.code, has_non_empty_match)
-            && check_and_track(levelId, other.levelId, has_non_empty_match)
-            && check_and_track(name, other.name, has_non_empty_match)
-            && has_non_empty_match;
+        return check_and_track(stageId, other.stageId, has_non_empty_match) &&
+               check_and_track(code, other.code, has_non_empty_match) &&
+               check_and_track(levelId, other.levelId, has_non_empty_match) &&
+               check_and_track(name, other.name, has_non_empty_match) && has_non_empty_match;
     }
 
     bool operator==(const std::string& any_key) const noexcept
