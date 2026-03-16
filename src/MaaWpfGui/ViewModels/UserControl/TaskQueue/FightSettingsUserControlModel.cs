@@ -779,6 +779,7 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
         }
         StagePlan = new ObservableCollection<StagePlanItem>(list);
         StagePlan.CollectionChanged += (_, __) => SaveStagePlan();
+        SetFightParams(); // 恢复StagePlan后, 修复AsstFightTask的Stage
     }
 
     private void SaveStagePlan()
