@@ -52,7 +52,7 @@ jobs:
         run: npm install -g @github/copilot
 
       # 步骤 2：执行 AI 分析，生成结果文件 copilot_answer.md
-      # 注意需搭配 issue 分析 skill 使用: https://github.com/MaaEnd/MaaEnd/blob/v2/.claude/skills/maaend-issue-log-analysis/SKILL.md
+      # 注意需搭配 issue 分析 skill 使用: https://github.com/MaaAssistantArknights/MaaAssistantArknights/blob/dev-v2/.claude/skills/maa-issue-log-analysis/SKILL.md
       - name: AI analysis
         shell: bash
         env:
