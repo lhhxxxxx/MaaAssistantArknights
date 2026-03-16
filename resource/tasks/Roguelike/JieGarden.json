@@ -170,6 +170,16 @@
         "cache": true,
         "next": ["JieGarden@Roguelike@CoppersAbandonConfirm", "#self"]
     },
+    "JieGarden@Roguelike@CoppersAfterAction": {
+        "template": "empty.png",
+        "Doc": "通宝操作完成后的跳转逻辑",
+        "next": [
+            "JieGarden@Roguelike@CoppersExchangeFinish",
+            "JieGarden@Roguelike@CoppersRecastConfirm",
+            "JieGarden@Roguelike@CloseCollectionContinue",
+            "JieGarden@Roguelike@CloseCollectionClose"
+        ]
+    },
     "JieGarden@Roguelike@CoppersAnalyzer-CastOCR": {
         "Doc": "通宝已投出状态识别 - 通宝已投出识别用 roi 为 通宝类型 的 Rect.move(me.roi)",
         "algorithm": "OcrDetect",
@@ -376,16 +386,6 @@
         "postDelay": 500,
         "roi": [1033, 462, 153, 155],
         "next": ["JieGarden@Roguelike@CoppersAfterAction", "#self"]
-    },
-    "JieGarden@Roguelike@CoppersAfterAction": {
-        "template": "empty.png",
-        "Doc": "通宝操作完成后的跳转逻辑",
-        "next": [
-            "JieGarden@Roguelike@CoppersExchangeFinish",
-            "JieGarden@Roguelike@CoppersRecastConfirm",
-            "JieGarden@Roguelike@CloseCollectionContinue",
-            "JieGarden@Roguelike@CloseCollectionClose"
-        ]
     },
     "JieGarden@Roguelike@CoppersTakeConfirm": {
         "Doc": "交换通宝确认按钮 (用于插件 RoguelikeCoppersTaskPlugin 的确认操作)",
