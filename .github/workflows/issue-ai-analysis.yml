@@ -39,9 +39,13 @@ jobs:
           copilot-github-token: ${{ secrets.COPILOT_GITHUB_TOKEN }}
           bot-name: '@MaaArknightsBot'
           initial-comment-body: |
-            🤖 **MaaBot 正在分析该 Issue...**
+            🤖 **MaaBot 正在分析该 Issue...**  
 
-            感谢您的反馈！AI 正在自动分析该问题，预计耗时约 10 分钟。
+            不需畏惧，我们会战胜那些鲁莽的家伙！  
+            对此事的分析已然展开，预计约需 10 分钟。  
+            再转身回头的时候，我们将带着胜利归来。
+          prompt-template: |
+            分析 GitHub Issue {{issue_number}}。把最终结论用“帕拉斯风格”写到 {{copilot_answer_file}}。
 
       - name: Consume outputs
         env:
