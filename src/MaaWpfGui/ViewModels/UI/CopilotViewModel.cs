@@ -1923,9 +1923,9 @@ public partial class CopilotViewModel : Screen
                 }
 
                 int skill = op.Skill;
-                if (skill < 1)
+                if (skill < 0)
                 {
-                    skill = 1;
+                    skill = 0;
                 }
                 else if (skill > 3)
                 {
@@ -1947,10 +1947,10 @@ public partial class CopilotViewModel : Screen
                 return matches.Select(match => {
                     var name = match.Groups[1].Value.Trim();
                     var skillStr = match.Groups[2].Value;
-                    int skill = string.IsNullOrEmpty(skillStr) ? 1 : int.Parse(skillStr);
-                    if (skill < 1)
+                    int skill = string.IsNullOrEmpty(skillStr) ? 0 : int.Parse(skillStr);
+                    if (skill < 0)
                     {
-                        skill = 1;
+                        skill = 0;
                     }
                     else if (skill > 3)
                     {
