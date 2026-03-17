@@ -18,6 +18,7 @@ using MaaWpfGui.Constants;
 using MaaWpfGui.Constants.Enums;
 using MaaWpfGui.Helper;
 using MaaWpfGui.Main;
+using MaaWpfGui.Models;
 using MaaWpfGui.Models.AsstTasks;
 using MaaWpfGui.ViewModels.UI;
 using Newtonsoft.Json.Linq;
@@ -45,9 +46,15 @@ public class StartUpSettingsUserControlModel : TaskSettingsViewModel, StartUpSet
 
     // UI 绑定的方法
     [UsedImplicitly]
-    public void AccountSwitchManualRun()
+    public async void AccountSwitchManualRun()
     {
-        _ = Instances.TaskQueueViewModel.QuickSwitchAccount();
+        if (TaskSettingVisibilityInfo.CurrentTask is not StartUpTask startUp)
+        {
+            Instances.TaskQueueViewModel.AddLog("Current task is not StartUpTask", UiLogColor.Error);
+            return;
+        }
+        var task = new StartUpTask() { AccountName = startUp.AccountName };
+        await Instances.TaskQueueViewModel.LinkStartWithTasks([task]);
     }
 
     public override void ProcSubTaskMsg(AsstMsg msg, JObject details)

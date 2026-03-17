@@ -1655,14 +1655,18 @@ public class TaskQueueViewModel : Screen
     /// <returns>Task</returns>
     public async Task LinkStart()
     {
-        if (!_runningState.GetIdle())
+        await LinkStartWithTasks(ConfigFactory.CurrentConfig.TaskQueue);
+    }
+
+    public async Task LinkStartWithTasks(IEnumerable<BaseTask> tasks)
+    {
+        if (!_runningState.Idle)
         {
             _logger.Information("Not idle, return.");
             return;
         }
 
         _taskStartTime = DateTime.Now;
-
         ClearLog();
 
         Instances.OverlayViewModel.LogItemsSource = LogItemViewModels;
@@ -1712,7 +1716,7 @@ public class TaskQueueViewModel : Screen
         */
 
         // 一般是点了“停止”按钮了
-        if (_runningState.GetStopping())
+        if (_runningState.Stopping)
         {
             SetStopped();
             return;
@@ -1724,7 +1728,7 @@ public class TaskQueueViewModel : Screen
         }
 
         // 一般是点了“停止”按钮了
-        if (_runningState.GetStopping())
+        if (_runningState.Stopping)
         {
             SetStopped();
             return;
@@ -1734,8 +1738,9 @@ public class TaskQueueViewModel : Screen
 
         // 直接遍历TaskItemViewModels里面的内容，是排序后的
         int count = 0;
-        foreach (var (index, item) in ConfigFactory.CurrentConfig.TaskQueue.Select((task, i) => (i, task)))
+        foreach (var item in tasks)
         {
+            var index = ConfigFactory.CurrentConfig.TaskQueue.IndexOf(item);
             _logger.Information("Index {Index}, Type {TaskType}, Name {TaskName}, IsEnable {IsEnable}",
                 index,
                 item.TaskType,
@@ -1743,7 +1748,7 @@ public class TaskQueueViewModel : Screen
                 item.IsEnable);
             if (!IsTaskEnable(item))
             {
-                Instances.TaskQueueViewModel.TaskItemViewModels[index].Status = 4;
+                SetTaskStatus(index, 4);
                 continue;
             }
 
@@ -1753,16 +1758,16 @@ public class TaskQueueViewModel : Screen
                 {
                     case true:
                         ++count;
-                        Instances.TaskQueueViewModel.TaskItemViewModels[index].TaskId = Instances.AsstProxy.TasksStatus.Last().Key;
+                        Instances.TaskQueueViewModel.TaskItemViewModels.ElementAtOrDefault(index)?.TaskId = Instances.AsstProxy.TasksStatus.Last().Key;
                         break;
                     case false:
                         taskRet = false;
                         AddLog(LocalizationHelper.GetStringFormat("TaskAppend.Error", LocalizationHelper.GetString(item.TaskType.ToString()), item.Name), UiLogColor.Error);
-                        Instances.TaskQueueViewModel.TaskItemViewModels[index].Status = (int)Main.TaskStatus.Error;
+                        SetTaskStatus(index, (int)Main.TaskStatus.Error);
                         break;
                     case null:
                         AddLog(LocalizationHelper.GetStringFormat("TaskAppend.Skip", LocalizationHelper.GetString(item.TaskType.ToString()), item.Name), UiLogColor.Info);
-                        Instances.TaskQueueViewModel.TaskItemViewModels[index].Status = 4;
+                        SetTaskStatus(index, 4);
                         break;
                 }
             }
@@ -1800,6 +1805,19 @@ public class TaskQueueViewModel : Screen
 
         AchievementTrackerHelper.Instance.MissionStartCountAdd();
         AchievementTrackerHelper.Instance.UseDailyAdd();
+
+        void SetTaskStatus(int index, int status)
+        {
+            if (index < 0 || index >= Instances.TaskQueueViewModel.TaskItemViewModels.Count)
+            {
+                return;
+            }
+
+            foreach (var item in Instances.TaskQueueViewModel.TaskItemViewModels)
+            {
+                item.Status = status;
+            }
+        }
     }
 
     public void ManualStop()
@@ -1885,13 +1903,7 @@ public class TaskQueueViewModel : Screen
         }
     }
 
-    private bool _roguelikeInCombatAndShowWait;
-
-    public bool RoguelikeInCombatAndShowWait
-    {
-        get => _roguelikeInCombatAndShowWait;
-        set => SetAndNotify(ref _roguelikeInCombatAndShowWait, value);
-    }
+    public bool RoguelikeInCombatAndShowWait { get => field; set => SetAndNotify(ref field, value); }
 
     public void SetStopped()
     {
@@ -1913,78 +1925,9 @@ public class TaskQueueViewModel : Screen
         // 只抑制“本轮任务期间”的自动开启；任务结束后应允许下一轮自动开启 LiveView。
     }
 
-    // 该函数将于未来被废弃，改用 LinkStart 代替
-    public async Task QuickSwitchAccount()
-    {
-        if (!_runningState.GetIdle())
-        {
-            return;
-        }
-
-        _runningState.SetIdle(false);
-        _taskStartTime = DateTime.Now; // 快速修复
-
-        // 虽然更改时已经保存过了，不过保险起见在点击开始之后再次保存任务和基建列表
-        // TaskItemSelectionChanged();
-        // InfrastTask.InfrastOrderSelectionChanged();
-        ClearLog();
-
-        await Task.Run(() => SettingsViewModel.GameSettings.RunScript("StartsWithScript"));
-
-        AddLog(LocalizationHelper.GetString("ConnectingToEmulator"));
-
-        /*
-        // 现在的主流模拟器都已经更新过自带的 adb 了，不再需要替换
-        if (!Instances.SettingsViewModel.AdbReplaced && !Instances.SettingsViewModel.IsAdbTouchMode())
-        {
-            AddLog(LocalizationHelper.GetString("AdbReplacementTips"), UiLogColor.Info);
-        }
-        */
-
-        // 一般是点了“停止”按钮了
-        if (_runningState.GetStopping())
-        {
-            SetStopped();
-            return;
-        }
-
-        if (!await ConnectToEmulator())
-        {
-            return;
-        }
-
-        // 一般是点了“停止”按钮了
-        if (_runningState.GetStopping())
-        {
-            SetStopped();
-            return;
-        }
-
-        bool taskRet = true;
-        taskRet &= StartUpTask.SerializeTask(TaskSettingVisibilityInfo.CurrentTask) is true;
-        taskRet &= Instances.AsstProxy.AsstStart();
-
-        if (taskRet)
-        {
-            AddLog(LocalizationHelper.GetString("Running"));
-        }
-        else
-        {
-            AddLog(LocalizationHelper.GetString("UnknownErrorOccurs"));
-            await Stop();
-            SetStopped();
-        }
-    }
-
     public bool EnableSetFightParams { get; set; } = true;
 
-    private bool _inited = false;
-
-    public bool Inited
-    {
-        get => _inited;
-        set => SetAndNotify(ref _inited, value);
-    }
+    public bool Inited { get => field; set => SetAndNotify(ref field, value); }
 
     private bool _idle;
 
