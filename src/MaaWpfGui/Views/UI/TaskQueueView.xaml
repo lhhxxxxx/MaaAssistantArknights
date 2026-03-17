@@ -206,6 +206,8 @@
                                 <Style BasedOn="{StaticResource NoSelectedHighlightListBoxItemStyle}" TargetType="{x:Type ListBoxItem}">
                                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                                     <Setter Property="Padding" Value="0" />
+                                    <Setter Property="MinHeight" Value="24.5" />
+                                    <Setter Property="Height" Value="24.5" />
                                 </Style>
                             </ListBox.ItemContainerStyle>
                         </ListBox>
