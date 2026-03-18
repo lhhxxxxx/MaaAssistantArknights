@@ -516,9 +516,11 @@ public class ConnectSettingsUserControlModel : PropertyChangedBase
 
             try
             {
+                // 原版路径优先
                 string[] possiblePaths =
                 [
-                    @"Software\leidian\ldplayer9", // 原版路径优先
+                    @"Software\leidian\ldplayer14",
+                    @"Software\leidian\ldplayer9",
                     @"Software\mrfz\mrfz"
                 ];
 
