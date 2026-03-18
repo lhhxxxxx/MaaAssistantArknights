@@ -106,7 +106,8 @@ public class StageManager
             }
             else if (cached)
             {
-                growlInfo.Message = LocalizationHelper.GetString("ApiCacheLoaded");
+                // growlInfo.Message = LocalizationHelper.GetString("ApiCacheLoaded");
+                return;
             }
             else
             {
