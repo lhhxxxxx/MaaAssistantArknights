@@ -1684,6 +1684,7 @@ public class TaskQueueViewModel : Screen
         }
 
         MainTasksCompletedCount = 0;
+        ResetTaskItemStatuses();
 
         // 所有提前 return 都要放在 _runningState.SetIdle(false) 之前，否则会导致无法再次点击开始
         _runningState.SetIdle(false);
@@ -1806,6 +1807,14 @@ public class TaskQueueViewModel : Screen
             {
                 item.Status = status;
             }
+        }
+    }
+
+    private void ResetTaskItemStatuses()
+    {
+        foreach (var item in TaskItemViewModels)
+        {
+            item.Status = (int)Main.TaskStatus.Idle;
         }
     }
 

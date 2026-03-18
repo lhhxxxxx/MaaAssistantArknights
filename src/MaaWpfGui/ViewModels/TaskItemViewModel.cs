@@ -42,8 +42,13 @@ public class TaskItemViewModel : PropertyChangedBase
     {
         get => _isEnable;
         set {
-            SetAndNotify(ref _isEnable, value);
+            if (!SetAndNotify(ref _isEnable, value))
+            {
+                return;
+            }
+
             ConfigFactory.CurrentConfig.TaskQueue[Index].IsEnable = value;
+            Status = 0;
         }
     }
 

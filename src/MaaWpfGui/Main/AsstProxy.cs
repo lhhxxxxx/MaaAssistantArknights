@@ -1042,7 +1042,6 @@ public class AsstProxy
                 foreach (var i in Instances.TaskQueueViewModel.TaskItemViewModels)
                 {
                     i.TaskId = 0;
-                    i.Status = (int)TaskStatus.Idle;
                 }
                 _tasksStatus.Clear();
                 break;
@@ -1192,7 +1191,6 @@ public class AsstProxy
                 foreach (var i in Instances.TaskQueueViewModel.TaskItemViewModels)
                 {
                     i.TaskId = 0;
-                    i.Status = (int)TaskStatus.Idle;
                 }
                 _tasksStatus.Clear();
 
