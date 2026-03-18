@@ -20,7 +20,7 @@ using ObservableCollections;
 
 namespace MaaWpfGui.Configuration.Single;
 
-public class SpecificConfig : INotifyPropertyChanged
+public class SpecificConfig : INotifyPropertyChanged, IJsonOnDeserialized
 {
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -40,5 +40,22 @@ public class SpecificConfig : INotifyPropertyChanged
     public void OnPropertyChanged(string propertyName, object before, object after)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventDetailArgs(propertyName, before, after));
+    }
+
+    public void OnDeserialized()
+    {
+        if (TaskQueue.Count > 0)
+        {
+            return;
+        }
+        TaskQueue.Add(new StartUpTask());
+        TaskQueue.Add(new FightTask());
+        TaskQueue.Add(new InfrastTask());
+        TaskQueue.Add(new FightTask());
+        TaskQueue.Add(new RecruitTask());
+        TaskQueue.Add(new MallTask());
+        TaskQueue.Add(new AwardTask());
+        TaskQueue.Add(new RoguelikeTask());
+        TaskQueue.Add(new ReclamationTask());
     }
 }
