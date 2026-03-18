@@ -309,7 +309,7 @@ public class RecruitSettingsUserControlModel : TaskSettingsViewModel, RecruitSet
             }
 
             return taskId switch {
-                int id when id > 0 => (Instances.AsstProxy.AsstSetTaskParamsEncoded(id, task), 0),
+                int id when id > 0 => (Instances.AsstProxy.AsstSetTaskParamsEncoded(id, task), id),
                 null => Instances.AsstProxy.AsstAppendTaskWithEncoding(TaskType.Recruit, task),
                 _ => (null, 0),
             };

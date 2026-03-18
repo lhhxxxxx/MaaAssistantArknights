@@ -195,7 +195,7 @@ public class MallSettingsUserControlModel : TaskSettingsViewModel, MallSettingsU
         {
             if (baseTask is not MallTask mall)
             {
-                return (false, 0);
+                return (null, 0);
             }
 
             var fightStageEmpty = false;
