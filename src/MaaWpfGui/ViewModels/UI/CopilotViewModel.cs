@@ -1988,7 +1988,7 @@ public partial class CopilotViewModel : Screen
             };
 
             // 能用列表的是主线/ss/故事集/悖论，都是 Copilot 类型
-            var ret = Instances.AsstProxy.AsstAppendTaskWithEncoding(AsstProxy.TaskType.Copilot, task);
+            var ret = Instances.AsstProxy.AsstAppendTaskWithEncoding(AsstProxy.TaskType.Copilot, task).IsSuccess;
             return ret && Instances.AsstProxy.AsstStart();
         }
         else if (CopilotTabIndex == 2)
@@ -2001,7 +2001,7 @@ public partial class CopilotViewModel : Screen
             });
 
             var task = new AsstParadoxCopilotTask() { MultiTasks = [.. t], };
-            var ret = Instances.AsstProxy.AsstAppendTaskWithEncoding(AsstProxy.TaskType.Copilot, task);
+            var ret = Instances.AsstProxy.AsstAppendTaskWithEncoding(AsstProxy.TaskType.Copilot, task).IsSuccess;
             return ret && Instances.AsstProxy.AsstStart();
         }
         else
@@ -2026,7 +2026,7 @@ public partial class CopilotViewModel : Screen
         if (CopilotTabIndex == 2)
         {
             var singleTask = new AsstParadoxCopilotTask() { FileName = TempCopilotFile };
-            appended = Instances.AsstProxy.AsstAppendTaskWithEncoding(AsstProxy.TaskType.Copilot, singleTask);
+            appended = Instances.AsstProxy.AsstAppendTaskWithEncoding(AsstProxy.TaskType.Copilot, singleTask).IsSuccess;
         }
         else
         {

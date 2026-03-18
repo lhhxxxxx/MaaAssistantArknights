@@ -603,7 +603,7 @@ public class RemoteControlService
                             var tasks = ConfigFactory.CurrentConfig.TaskQueue.OfType<InfrastTask>().ToList();
                             if (tasks.Count == 1)
                             {
-                                taskRet &= InfrastSettingsUserControlModel.Instance.SerializeTask(tasks[0]) ?? false;
+                                taskRet &= InfrastSettingsUserControlModel.Instance.SerializeTask(tasks[0]).IsSuccess ?? false;
                                 break;
                             }
 
@@ -616,7 +616,7 @@ public class RemoteControlService
                             var tasks = ConfigFactory.CurrentConfig.TaskQueue.OfType<StartUpTask>().ToList();
                             if (tasks.Count == 1)
                             {
-                                taskRet &= StartUpSettingsUserControlModel.Instance.SerializeTask(tasks[0]) ?? false;
+                                taskRet &= StartUpSettingsUserControlModel.Instance.SerializeTask(tasks[0]).IsSuccess ?? false;
                                 break;
                             }
 
@@ -629,7 +629,7 @@ public class RemoteControlService
                             var tasks = ConfigFactory.CurrentConfig.TaskQueue.OfType<FightTask>().ToList();
                             if (tasks.Count == 1)
                             {
-                                taskRet &= FightSettingsUserControlModel.Instance.SerializeTask(tasks[0]) ?? false;
+                                taskRet &= FightSettingsUserControlModel.Instance.SerializeTask(tasks[0]).IsSuccess ?? false;
                                 break;
                             }
 
@@ -642,7 +642,7 @@ public class RemoteControlService
                             var tasks = ConfigFactory.CurrentConfig.TaskQueue.OfType<RecruitTask>().ToList();
                             if (tasks.Count == 1)
                             {
-                                taskRet &= RecruitSettingsUserControlModel.Instance.SerializeTask(tasks[0]) ?? false;
+                                taskRet &= RecruitSettingsUserControlModel.Instance.SerializeTask(tasks[0]).IsSuccess ?? false;
                                 break;
                             }
 
@@ -655,7 +655,7 @@ public class RemoteControlService
                             var tasks = ConfigFactory.CurrentConfig.TaskQueue.OfType<MallTask>().ToList();
                             if (tasks.Count == 1)
                             {
-                                taskRet &= MallSettingsUserControlModel.Instance.SerializeTask(tasks[0]) ?? false;
+                                taskRet &= MallSettingsUserControlModel.Instance.SerializeTask(tasks[0]).IsSuccess ?? false;
                                 break;
                             }
 
@@ -668,7 +668,7 @@ public class RemoteControlService
                             var tasks = ConfigFactory.CurrentConfig.TaskQueue.OfType<AwardTask>().ToList();
                             if (tasks.Count == 1)
                             {
-                                taskRet &= AwardSettingsUserControlModel.Instance.SerializeTask(tasks[0]) ?? false;
+                                taskRet &= AwardSettingsUserControlModel.Instance.SerializeTask(tasks[0]).IsSuccess ?? false;
                                 break;
                             }
 
@@ -681,7 +681,7 @@ public class RemoteControlService
                             var tasks = ConfigFactory.CurrentConfig.TaskQueue.OfType<RoguelikeTask>().ToList();
                             if (tasks.Count == 1)
                             {
-                                taskRet &= RoguelikeSettingsUserControlModel.Instance.SerializeTask(tasks[0]) ?? false;
+                                taskRet &= RoguelikeSettingsUserControlModel.Instance.SerializeTask(tasks[0]).IsSuccess ?? false;
                                 break;
                             }
 
@@ -694,7 +694,7 @@ public class RemoteControlService
                             var tasks = ConfigFactory.CurrentConfig.TaskQueue.OfType<ReclamationTask>().ToList();
                             if (tasks.Count == 1)
                             {
-                                taskRet &= ReclamationSettingsUserControlModel.Instance.SerializeTask(tasks[0]) ?? false;
+                                taskRet &= ReclamationSettingsUserControlModel.Instance.SerializeTask(tasks[0]).IsSuccess ?? false;
                                 break;
                             }
 

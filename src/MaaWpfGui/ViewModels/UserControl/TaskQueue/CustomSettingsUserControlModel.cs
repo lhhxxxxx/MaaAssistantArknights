@@ -70,24 +70,24 @@ public class CustomSettingsUserControlModel : TaskSettingsViewModel, CustomSetti
         }
     }
 
-    public override bool? SerializeTask(BaseTask? baseTask, int? taskId = null) => (this as ISerialize).Serialize(baseTask, taskId);
+    public override (bool? IsSuccess, int TaskId) SerializeTask(BaseTask? baseTask, int? taskId = null) => (this as ISerialize)?.Serialize(baseTask, taskId) ?? (null, 0);
 
     private interface ISerialize : ITaskQueueModelSerialize
     {
-        bool? ITaskQueueModelSerialize.Serialize(BaseTask? baseTask, int? taskId)
+        (bool? IsSuccess, int TaskId) ITaskQueueModelSerialize.Serialize(BaseTask? baseTask, int? taskId)
         {
             if (baseTask is not CustomTask custom)
             {
-                return null;
+                return (null, 0);
             }
 
             var task = new AsstCustomTask() {
                 CustomTasks = [.. custom.CustomTaskName.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(task => task.Trim())],
             };
             return taskId switch {
-                int id when id > 0 => Instances.AsstProxy.AsstSetTaskParamsEncoded(id, task),
+                int id when id > 0 => (Instances.AsstProxy.AsstSetTaskParamsEncoded(id, task), id),
                 null => Instances.AsstProxy.AsstAppendTaskWithEncoding(TaskType.Custom, task),
-                _ => null,
+                _ => (null, 0),
             };
         }
     }

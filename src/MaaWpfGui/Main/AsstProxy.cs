@@ -2944,14 +2944,22 @@ public class AsstProxy
     }
     */
 
-    public bool AsstAppendTaskWithEncoding(TaskType wpfTasktype, AsstBaseTask task)
+    public (bool IsSuccess, int TaskId) AsstAppendTaskWithEncoding(TaskType wpfTasktype, AsstBaseTask task)
     {
         return AsstAppendTaskWithEncoding(wpfTasktype, task.Serialize());
     }
 
-    public bool AsstAppendTaskWithEncoding(TaskType wpfTaskType, (AsstTaskType Type, JObject? TaskParams) task)
+    public (bool IsSuccess, int TaskId) AsstAppendTaskWithEncoding(TaskType wpfTaskType, (AsstTaskType Type, JObject? TaskParams) task)
     {
-        return AsstAppendTaskWithEncoding(wpfTaskType, task.Type, task.TaskParams);
+        task.TaskParams ??= [];
+        AsstTaskId id = AsstAppendTask(_handle, task.Type.ToString(), JsonConvert.SerializeObject(task.TaskParams));
+        if (id == 0)
+        {
+            return (false, 0);
+        }
+
+        _tasksStatus.Add(id, (wpfTaskType, TaskStatus.Idle));
+        return (true, id);
     }
 
     public bool AsstAppendTaskWithEncoding(TaskType wpfTaskType, AsstTaskType type, JObject? taskParams = null)

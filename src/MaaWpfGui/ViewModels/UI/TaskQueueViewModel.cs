@@ -1754,11 +1754,12 @@ public class TaskQueueViewModel : Screen
 
             try
             {
-                switch (SerializeTask(item))
+                var (isSuccess, taskId) = SerializeTask(item);
+                switch (isSuccess)
                 {
                     case true:
                         ++count;
-                        Instances.TaskQueueViewModel.TaskItemViewModels.ElementAtOrDefault(index)?.TaskId = Instances.AsstProxy.TasksStatus.Last().Key;
+                        Instances.TaskQueueViewModel.TaskItemViewModels.ElementAtOrDefault(index)?.TaskId = taskId;
                         break;
                     case false:
                         taskRet = false;
@@ -2067,13 +2068,19 @@ public class TaskQueueViewModel : Screen
     /// <param name="task">存储的任务</param>
     /// <param name="taskId">任务id, null时追加任务, 非null为设置任务参数</param>
     /// <returns>null为未序列化, false失败, true成功</returns>
-    private static bool? SerializeTask(BaseTask task, int? taskId = null)
+    private static (bool? IsSuccess, int TaskId) SerializeTask(BaseTask task, int? taskId = null)
     {
         bool? ret = null;
+        int id = 0;
         foreach (var instance in _taskViewModelTypes)
         {
-            ret ??= instance.SerializeTask(task, taskId);
+            if (ret is null)
+            {
+                var (isSuccess, id2) = instance.SerializeTask(task, taskId);
+                ret = isSuccess;
+                id = id2;
+            }
         }
-        return ret;
+        return (ret, id);
     }
 }

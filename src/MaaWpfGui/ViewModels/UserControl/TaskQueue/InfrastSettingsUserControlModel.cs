@@ -541,15 +541,15 @@ public class InfrastSettingsUserControlModel : TaskSettingsViewModel, InfrastSet
         }
     }
 
-    public override bool? SerializeTask(BaseTask? baseTask, int? taskId = null) => (this as ISerialize).Serialize(baseTask, taskId);
+    public override (bool? IsSuccess, int TaskId) SerializeTask(BaseTask? baseTask, int? taskId = null) => (this as ISerialize)?.Serialize(baseTask, taskId) ?? (null, 0);
 
     private interface ISerialize : ITaskQueueModelSerialize
     {
-        bool? ITaskQueueModelSerialize.Serialize(BaseTask? baseTask, int? taskId)
+        (bool? IsSuccess, int TaskId) ITaskQueueModelSerialize.Serialize(BaseTask? baseTask, int? taskId)
         {
             if (baseTask is not InfrastTask infrast)
             {
-                return null;
+                return (null, 0);
             }
 
             var task = new AsstInfrastTask {
@@ -594,9 +594,9 @@ public class InfrastSettingsUserControlModel : TaskSettingsViewModel, InfrastSet
             }
 
             return taskId switch {
-                int id when id > 0 => Instances.AsstProxy.AsstSetTaskParamsEncoded(id, task),
+                int id when id > 0 => (Instances.AsstProxy.AsstSetTaskParamsEncoded(id, task), id),
                 null => Instances.AsstProxy.AsstAppendTaskWithEncoding(TaskType.Infrast, task),
-                _ => null,
+                _ => (null, 0),
             };
         }
     }

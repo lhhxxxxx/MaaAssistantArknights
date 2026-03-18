@@ -697,12 +697,12 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
 
         if (ConfigFactory.CurrentConfig.TaskQueue.IndexOf(fight) is int index && index > -1 && Instances.TaskQueueViewModel.TaskItemViewModels[index].TaskId > 0)
         {
-            return SerializeTask(fight, Instances.TaskQueueViewModel.TaskItemViewModels[index].TaskId);
+            return SerializeTask(fight, Instances.TaskQueueViewModel.TaskItemViewModels[index].TaskId).IsSuccess;
         }
         return null;
     }
 
-    public override bool? SerializeTask(BaseTask? baseTask, int? taskId = null) => (this as ISerialize).Serialize(baseTask, taskId);
+    public override (bool? IsSuccess, int TaskId) SerializeTask(BaseTask? baseTask, int? taskId = null) => (this as ISerialize).Serialize(baseTask, taskId);
 
     #region 关卡列表更新
 
@@ -912,23 +912,23 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
 
     private interface ISerialize : ITaskQueueModelSerialize
     {
-        bool? ITaskQueueModelSerialize.Serialize(BaseTask? baseTask, int? taskId)
+        (bool? IsSuccess, int TaskId) ITaskQueueModelSerialize.Serialize(BaseTask? baseTask, int? taskId)
         {
             if (baseTask is not FightTask fight || taskId is int and <= 0)
             {
-                return null;
+                return (null, 0);
             }
 
             if (fight.UseWeeklySchedule && fight.WeeklySchedule.TryGetValue(Instances.TaskQueueViewModel.CurDayOfWeek, out var isEnabled) && !isEnabled)
             {
-                return null;
+                return (null, 0);
             }
 
             using var scope = _lock.EnterScope();
             var stage = FightSettingsUserControlModel.GetFightStage(fight.StagePlan);
             if (stage is null)
             {
-                return null;
+                return (null, 0);
             }
             var task = new AsstFightTask() {
                 Stage = stage,
@@ -962,9 +962,9 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
             }
 
             return taskId switch {
-                int id when id > 0 => Instances.AsstProxy.AsstSetTaskParamsEncoded(id, task),
+                int id when id > 0 => (Instances.AsstProxy.AsstSetTaskParamsEncoded(id, task), id),
                 null => Instances.AsstProxy.AsstAppendTaskWithEncoding(TaskType.Fight, task),
-                _ => null,
+                _ => (null, 0),
             };
         }
     }
