@@ -39,6 +39,7 @@ using MaaWpfGui.Services.RemoteControl;
 using MaaWpfGui.Services.Web;
 using MaaWpfGui.States;
 using MaaWpfGui.Utilities;
+using MaaWpfGui.ViewModels.Dialogs;
 using MaaWpfGui.ViewModels.UI;
 using MaaWpfGui.ViewModels.UserControl.Settings;
 using MaaWpfGui.Views.Dialogs;
@@ -372,6 +373,18 @@ public class Bootstrapper : Bootstrapper<RootViewModel>
         _logger.Information("===================================");
 
         ConfigurationHelper.Load();
+        if (VersionUpdateDialogViewModel.HasPendingUpdatePackage())
+        {
+            _logger.Information("Pending update package detected, applying before full startup");
+            if (VersionUpdateDialogViewModel.TryApplyPendingUpdatePackage())
+            {
+                RestartAfterPendingUpdateEarly();
+                return;
+            }
+
+            _logger.Warning("Pending update package could not be applied, continuing with normal startup");
+        }
+
         ConfigConverter.ConvertConfig();
         LocalizationHelper.Load();
         ETagCache.Load();
@@ -713,6 +726,25 @@ public class Bootstrapper : Bootstrapper<RootViewModel>
 
     private static bool _isRestartingWithoutArgs;
     private static ProcessStartInfo _restartStartInfo;
+
+    /// <summary>
+    /// 在完整 GUI 尚未初始化前，应用待处理更新后立即重启。
+    /// </summary>
+    private static void RestartAfterPendingUpdateEarly()
+    {
+        _logger.Information("Pending update package applied, restarting application");
+        if (Environment.ProcessPath is not null)
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = Environment.ProcessPath,
+                WorkingDirectory = AppDomain.CurrentDomain.BaseDirectory,
+                UseShellExecute = true,
+            });
+        }
+
+        Environment.Exit(0);
+    }
 
     /// <summary>
     /// 重启，不带参数
