@@ -31,6 +31,7 @@ using JetBrains.Annotations;
 using MaaWpfGui.Configuration.Factory;
 using MaaWpfGui.Configuration.Single.MaaTask;
 using MaaWpfGui.Constants;
+using MaaWpfGui.Constants.Enums;
 using MaaWpfGui.Extensions;
 using MaaWpfGui.Helper;
 using MaaWpfGui.Main;
@@ -122,6 +123,11 @@ public class TaskQueueViewModel : Screen
     /// Gets 生稀盐酸任务Model
     /// </summary>
     public static ReclamationSettingsUserControlModel ReclamationTask => ReclamationSettingsUserControlModel.Instance;
+
+    /// <summary>
+    /// Gets 更新用户数据任务Model
+    /// </summary>
+    public static UserDataUpdateSettingsUserControlModel UserDataUpdateTask => UserDataUpdateSettingsUserControlModel.Instance;
 
     /// <summary>
     /// Gets 生稀盐酸任务Model
@@ -1277,6 +1283,7 @@ public class TaskQueueViewModel : Screen
             new GenericCombinedData<Type> { Display = LocalizationHelper.GetString("Award"), Value = typeof(AwardTask) },
             new GenericCombinedData<Type> { Display = LocalizationHelper.GetString("Roguelike"), Value = typeof(RoguelikeTask) },
             new GenericCombinedData<Type> { Display = LocalizationHelper.GetString("Reclamation"), Value = typeof(ReclamationTask) },
+            new GenericCombinedData<Type> { Display = LocalizationHelper.GetString("UserDataUpdate"), Value = typeof(UserDataUpdateTask) },
             new GenericCombinedData<Type> { Display = LocalizationHelper.GetString("Custom"), Value = typeof(CustomTask) },
         ]);
 
@@ -1737,27 +1744,28 @@ public class TaskQueueViewModel : Screen
                 item.IsEnable);
             if (!IsTaskEnable(item))
             {
-                SetTaskStatus(index, 4);
+                SetTaskStatus(index, TaskItemStatus.Skipped);
                 continue;
             }
 
             try
             {
-                var (isSuccess, taskId) = SerializeTask(item);
+                var (isSuccess, taskIds) = SerializeTask(item);
                 switch (isSuccess)
                 {
                     case true:
                         ++count;
-                        Instances.TaskQueueViewModel.TaskItemViewModels.ElementAtOrDefault(index)?.TaskId = taskId;
+                        Instances.TaskQueueViewModel.TaskItemViewModels[index].SetTaskIds(taskIds);
+                        // Instances.TaskQueueViewModel.TaskItemViewModels.ElementAtOrDefault(index)?.TaskId = taskId;
                         break;
                     case false:
                         taskRet = false;
                         AddLog(LocalizationHelper.GetStringFormat("TaskAppend.Error", LocalizationHelper.GetString(item.TaskType.ToString()), item.Name), UiLogColor.Error);
-                        SetTaskStatus(index, (int)Main.TaskStatus.Error);
+                        SetTaskStatus(index, TaskItemStatus.Error);
                         break;
                     case null:
                         AddLog(LocalizationHelper.GetStringFormat("TaskAppend.Skip", LocalizationHelper.GetString(item.TaskType.ToString()), item.Name), UiLogColor.Info);
-                        SetTaskStatus(index, 4);
+                        SetTaskStatus(index, TaskItemStatus.Skipped);
                         break;
                 }
             }
@@ -1796,17 +1804,14 @@ public class TaskQueueViewModel : Screen
         AchievementTrackerHelper.Instance.MissionStartCountAdd();
         AchievementTrackerHelper.Instance.UseDailyAdd();
 
-        void SetTaskStatus(int index, int status)
+        static void SetTaskStatus(int index, TaskItemStatus status)
         {
             if (index < 0 || index >= Instances.TaskQueueViewModel.TaskItemViewModels.Count)
             {
                 return;
             }
 
-            foreach (var item in Instances.TaskQueueViewModel.TaskItemViewModels)
-            {
-                item.Status = status;
-            }
+            Instances.TaskQueueViewModel.TaskItemViewModels[index].StatusDisplay = status;
         }
     }
 
@@ -1814,7 +1819,7 @@ public class TaskQueueViewModel : Screen
     {
         foreach (var item in TaskItemViewModels)
         {
-            item.Status = (int)Main.TaskStatus.Idle;
+            item.StatusDisplay = TaskItemStatus.Idle;
         }
     }
 
@@ -2065,10 +2070,10 @@ public class TaskQueueViewModel : Screen
     /// <param name="task">存储的任务</param>
     /// <param name="taskId">任务id, null时追加任务, 非null为设置任务参数</param>
     /// <returns>null为未序列化, false失败, true成功</returns>
-    private static (bool? IsSuccess, int TaskId) SerializeTask(BaseTask task, int? taskId = null)
+    private static (bool? IsSuccess, IEnumerable<int> TaskIds) SerializeTask(BaseTask task, int? taskId = null)
     {
         bool? ret = null;
-        int id = 0;
+        IEnumerable<int> id = [];
         foreach (var instance in _taskViewModelTypes)
         {
             if (ret is null)
