@@ -435,7 +435,7 @@ description: 分析 MaaAssistantArknights 上游仓库公开 Issue（`https://gi
 
 <details><summary>Click here to expand</summary>
 
-Translate the complete conclusion directly into English and paste it here.
+Translate the complete conclusion directly into English and paste it here. Note that the English text is in `src/MaaWpfGui/Res/Localizations/en-us.xaml`.
 
 </details>
 
