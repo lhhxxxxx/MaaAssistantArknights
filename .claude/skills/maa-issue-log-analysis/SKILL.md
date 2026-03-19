@@ -372,13 +372,9 @@ description: 分析 MaaAssistantArknights 上游仓库公开 Issue（`https://gi
 - 相关设置项 / 关键提示文案：优先写 `src/MaaWpfGui/Res/Localizations/zh-cn.xaml` 中的中文文案
 - 用户现象：
 
-## 附件概览
-
-- 报告时间戳 / 分卷：
-- 实际可读文件：
-- 缺失或未上传的证据：
-
 ## 关键证据
+
+<details><summary>点击此处展开</summary>
 
 - `debug/gui.log`：
 - `debug/asst.log`：
@@ -387,17 +383,12 @@ description: 分析 MaaAssistantArknights 上游仓库公开 Issue（`https://gi
 - `debug/interface` / `debug/drops`：
 - 代码依据：如需指向具体实现，直接附远端 GitHub 行号链接
 
+</details>
+
 ## 根因判断
 
 - 直接结论：
 - 证据链：
-- 当前分支是否可能已修复：
-
-## 修复方案
-
-1. 代码 / 资源 / 配置层修复
-2. 需要补充的日志或截图
-3. 需要补充的测试
 
 ## 给用户的建议
 
@@ -406,9 +397,17 @@ description: 分析 MaaAssistantArknights 上游仓库公开 Issue（`https://gi
 - 是否需要等待开发者修复：
 - 是否有临时绕过方案：
 
+## 修复方案
+
+1. 代码 / 资源 / 配置层修复
+2. 需要补充的日志或截图
+3. 需要补充的测试
+
 ## 给 AI 的建议（可复制）
 
 给修复 AI 的指令，要求可直接执行。
+
+<details><summary>点击此处展开</summary>
 
 ~~~text
 已确认事实：
@@ -424,6 +423,8 @@ description: 分析 MaaAssistantArknights 上游仓库公开 Issue（`https://gi
 4. 回归验证：...
 5. 如果暂时无法彻底修复，至少补上：...
 ~~~
+
+</details>
 
 ## 置信度
 
