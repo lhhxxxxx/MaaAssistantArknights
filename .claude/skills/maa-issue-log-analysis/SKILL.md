@@ -430,6 +430,15 @@ description: 分析 MaaAssistantArknights 上游仓库公开 Issue（`https://gi
 
 - 高 / 中 / 低
 - 还缺什么证据
+
+## English translation
+
+<details><summary>Click here to expand</summary>
+
+Translate the complete conclusion directly into English and paste it here.
+
+</details>
+
 ```
 
 ## Reminders
