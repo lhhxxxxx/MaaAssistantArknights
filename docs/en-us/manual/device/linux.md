@@ -22,11 +22,11 @@ The MAA WPF GUI can currently be run through Wine. MAA now uses self-contained d
 1. Install Visual C++ Redistributable:
 
    Download and install [Visual C++ Redistributable](https://aka.ms/vc14/vc_redist.x64.exe):
-   
+
    ```shell
    wine vc_redist.x64.exe
    ```
-   
+
    ::: tip
    `DependencySetup_依赖库安装.bat` relies on winget and Windows privilege escalation, which typically doesn't work properly in Wine, so manual installation of runtime libraries is required.
    :::
