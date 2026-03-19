@@ -1061,8 +1061,11 @@ Right-click to clear inactive jobs</system:String>
     <system:String x:Key="CopilotCouldNotSaveFile" xml:space="preserve">Could not save copilot task to file: </system:String>
     <system:String x:Key="CopilotStartWithEmptyList">Using ｢{key=UseCopilotList}｣, but no tasks have been added</system:String>
     <system:String x:Key="CopilotSingleTaskWarning">You're using ｢{key=UseCopilotList}｣ to execute a single task, which is not recommended. For single tasks, please run them directly instead.</system:String>
-    <system:String x:Key="CopilotTaskListMixedModeNotAllowed">Currently using ｢{key=UseCopilotList}｣. Mixing different job types is not supported.</system:String>
+    <system:String x:Key="CopilotTaskListMixedModeNotAllowed">Currently using ｢{key=UseCopilotList}｣. Mixing different job types is not supported: {0}. Clear the list and re-add tasks under the same tab.</system:String>
+    <system:String x:Key="CopilotTaskListLegacyItemNotSupported">Currently using ｢{key=UseCopilotList}｣, but the list contains legacy items without tab info. Re-add those tasks under the correct tab before starting.</system:String>
+    <system:String x:Key="CopilotTaskListTabMismatch">Currently using ｢{key=UseCopilotList}｣. The current tab is "{0}", but the list belongs to "{1}". Switch to the matching tab before starting.</system:String>
     <system:String x:Key="CopilotTaskTypeParseFailedSkipCheck">Failed to parse some job types. Skipping type checks.</system:String>
+    <system:String x:Key="CopilotTaskTypeParseFailedKeepCurrentTab">Failed to determine the job type. Keeping the current tab for import.</system:String>
     <!--  !Logs  -->
     <!--  !Copilot  -->
     <!--  ErrorView  -->

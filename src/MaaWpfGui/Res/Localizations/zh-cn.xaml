@@ -1062,8 +1062,11 @@ C:\\leidian\\LDPlayer9。\n
     <system:String x:Key="CopilotCouldNotSaveFile" xml:space="preserve">无法保存作业文件到: </system:String>
     <system:String x:Key="CopilotStartWithEmptyList">正在使用 ｢{key=UseCopilotList}｣, 但未添加任何作业</system:String>
     <system:String x:Key="CopilotSingleTaskWarning">正在使用 ｢{key=UseCopilotList}｣ 执行单个作业, 不推荐此行为。 单个作业请直接运行</system:String>
-    <system:String x:Key="CopilotTaskListMixedModeNotAllowed">正在使用 ｢{key=UseCopilotList}｣，不支持混用不同类型作业</system:String>
+    <system:String x:Key="CopilotTaskListMixedModeNotAllowed">正在使用 ｢{key=UseCopilotList}｣，不支持混用不同类型作业：{0}。请清空列表后在同一页签重新添加</system:String>
+    <system:String x:Key="CopilotTaskListLegacyItemNotSupported">正在使用 ｢{key=UseCopilotList}｣，但列表包含旧版本条目（缺少页签信息），请在正确的页签重新添加这些作业后再启动</system:String>
+    <system:String x:Key="CopilotTaskListTabMismatch">正在使用 ｢{key=UseCopilotList}｣，当前页签为「{0}」，但列表来自「{1}」，请切换到对应页签后再启动</system:String>
     <system:String x:Key="CopilotTaskTypeParseFailedSkipCheck">部分作业类型解析失败，跳过类型检查</system:String>
+    <system:String x:Key="CopilotTaskTypeParseFailedKeepCurrentTab">无法判断作业类型，将保持当前页签导入</system:String>
     <!--  !日志  -->
     <!--  !自动战斗  -->
     <!--  ErrorDialogView  -->
