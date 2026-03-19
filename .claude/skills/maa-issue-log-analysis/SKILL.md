@@ -65,6 +65,7 @@ description: 分析 MaaAssistantArknights 上游仓库公开 Issue（`https://gi
 
  - 先以报告包中的 `config/` 与 `cache/resource/` 还原用户当时实际运行的配置和资源。
  - 再对照当前仓库代码，判断该问题是当前仍存在，还是当时存在但现在已修复。
+ - 输出给用户时，如果提到任务名、设置项、按钮名、错误提示或日志前缀，先到 `src/MaaWpfGui/Res/Localizations/zh-cn.xaml` 查中文文案，不要直接把 `LocalizationHelper.GetString("Key")` 里的 `Key`、`DynamicResource` key、`TaskChain` 名或枚举名当成最终展示文本。
 
 ## Report Map
 
@@ -304,6 +305,36 @@ description: 分析 MaaAssistantArknights 上游仓库公开 Issue（`https://gi
 
 - `src/MaaCore/Utils/DebugImageHelper.hpp`
 
+### GUI 中文文案
+
+- `src/MaaWpfGui/Res/Localizations/zh-cn.xaml`
+
+## Localized Copy
+
+- 总结任务类型、设置项、按钮、错误提示、日志前缀时，优先使用 `src/MaaWpfGui/Res/Localizations/zh-cn.xaml` 中的中文文案。
+- 常见查找顺序：
+    - 默认任务类型名：先看 `src/MaaWpfGui/ViewModels/UI/TaskQueueViewModel.cs` 中 `LocalizationHelper.GetString(taskType.ToString())` 的 key，再到 `src/MaaWpfGui/Res/Localizations/zh-cn.xaml` 查 `StartUp`、`Fight`、`Infrast`、`Recruit`、`Mall`、`Award`、`Roguelike`、`Reclamation`、`Custom`。
+    - 任务开始 / 完成 / 出错等 GUI 日志前缀：优先查 `StartTask`、`CompleteTask`、`TaskError`、`ConnectFailed`、`TryToReconnect` 等 key。
+    - 设置项、按钮、界面提示：先在对应 `*.xaml` / `*.cs` 里找 `DynamicResource SomeKey` 或 `LocalizationHelper.GetString("SomeKey")`，再到 `src/MaaWpfGui/Res/Localizations/zh-cn.xaml` 查中文。
+    - issue 反馈相关入口：优先查 `Issue`、`GenerateSupportPayload`、`OpenDebugFolder` 等 key。
+- 如果 `config/gui*.json` 里任务有用户自定义 `Name`，输出时优先保留用户自定义名称；必要时再括号补默认任务类型中文，例如 `刷理智（理智作战 / Fight）`。
+- 输出时优先写中文，必要时在括号里补原始 key / `taskChain` / 枚举名，例如 `基建换班（Infrast）`。
+- 如果 `src/MaaWpfGui/Res/Localizations/zh-cn.xaml` 没有对应 key，再退回原始 key 或代码里的英文字符串，并明确说明“未在 `src/MaaWpfGui/Res/Localizations/zh-cn.xaml` 找到对应文案”。
+
+## Linking Code Evidence
+
+- 如果要指向具体代码行，不要写本地路径加行号，也不要写绝对路径。
+- 统一给出对应仓库的远端 GitHub `blob` 行号链接。
+- MaaAssistantArknights 仓库链接格式：
+    - `https://github.com/MaaAssistantArknights/MaaAssistantArknights/blob/<commit>/<path>#L14-L20`
+- `<commit>` 必须是本次分析实际依据的代码版本：
+    - 默认使用当前检出的 `HEAD`
+    - 如果为了复核旧 issue 切到了某个 tag / commit，就使用那个版本解析后的 SHA
+- 例子：
+    - `https://github.com/MaaAssistantArknights/MaaAssistantArknights/blob/f8b64ef908d8b82bb71ba753b69a30ea658f9054/src/MaaWpfGui/Main/AsstProxy.cs#L1072-L1079`
+    - `https://github.com/MaaAssistantArknights/MaaAssistantArknights/blob/f8b64ef908d8b82bb71ba753b69a30ea658f9054/src/MaaWpfGui/Res/Localizations/zh-cn.xaml#L680-L695`
+- 如果引用的是其他上游仓库或文档，也用对应远端链接，不要给本地文件行号。
+
 ## Example Heuristic
 
 如果 issue 像 `#16014` 一样是 MuMu ADB 连接随机失败，并且同时出现：
@@ -337,7 +368,8 @@ description: 分析 MaaAssistantArknights 上游仓库公开 Issue（`https://gi
 
 - issue：`#1234`
 - 版本 / 资源时间：
-- 模拟器 / 连接配置 / 任务：
+- 模拟器 / 连接配置 / 任务：优先写 `zh-cn` 中文任务名；如果日志里是用户自定义任务名，先写自定义名，再补默认任务类型中文 / key
+- 相关设置项 / 关键提示文案：优先写 `src/MaaWpfGui/Res/Localizations/zh-cn.xaml` 中的中文文案
 - 用户现象：
 
 ## 附件概览
@@ -353,6 +385,7 @@ description: 分析 MaaAssistantArknights 上游仓库公开 Issue（`https://gi
 - `config/gui.json` / `config/gui.new.json`：
 - `cache/resource` / `cache/gui`：
 - `debug/interface` / `debug/drops`：
+- 代码依据：如需指向具体实现，直接附远端 GitHub 行号链接
 
 ## 根因判断
 
@@ -407,4 +440,6 @@ description: 分析 MaaAssistantArknights 上游仓库公开 Issue（`https://gi
 - 如果问题本身没有在当前日志中复现，要明确写“证据未复现”，不要硬凑结论。
 - 如果 issue 版本很旧，要明确区分“当时的根因”和“当前分支是否已修复”。
 - 如果用户日志与当前代码不一致，先按用户版本 tag 复核；若确认已修，再看修复是否已进入 tag / release：已发版建议升级，未发版建议等待 release。
+- 如果回答里出现任务名、设置项、按钮名、提示文案，优先使用 `src/MaaWpfGui/Res/Localizations/zh-cn.xaml` 的中文文案；必要时才在括号里补原始 key / `taskChain` / 枚举名。
+- 如果回答里引用了具体代码行，直接给远端 GitHub `blob` 行号链接，不要给本地路径加行号。
 - 如果证据表明问题已在新版本修复，明确建议用户升级；如果怀疑安装包、资源文件或配置损坏，明确建议重新下载或重建；如果判断为真实代码缺陷且暂无 workaround，明确建议等待开发者修复。
