@@ -1140,7 +1140,7 @@ public partial class CopilotViewModel : Screen
         return (0, null);
     }
 
-    private async Task<bool> ParseCopilotAsync(CopilotModel copilot, bool writeToCache, bool copilotList, int copilotId)
+    private async Task<bool> ParseCopilotAsync(CopilotModel copilot, bool writeToCache, bool copilotList, int copilotId, bool printInfo = true)
     {
         if (string.IsNullOrEmpty(copilot.StageName))
         {
@@ -1181,9 +1181,12 @@ public partial class CopilotViewModel : Screen
                 oper.Skill = 0;
             }
         }
+        if (printInfo)
+        {
         foreach (var (output, color) in copilot.Output())
         {
             AddLog(output, color ?? UiLogColor.Message, showTime: false); // 作业信息输出
+        }
         }
 
         MapUrl = MapUiUrl.Replace("areas", "map/" + copilot.StageName);
@@ -1352,7 +1355,11 @@ public partial class CopilotViewModel : Screen
             var (copilotId, payload) = await task;
             if (payload is CopilotModel copilot)
             {
-                await ParseCopilotAsync(copilot, true, true, copilotId);
+                if (!await ParseCopilotAsync(copilot, true, true, copilotId, false))
+                {
+                    AddLog(LocalizationHelper.GetString("CopilotJsonError") + $", copilotId: {copilotId}", UiLogColor.Error, showTime: false);
+                    continue;
+                }
             }
         }
 
