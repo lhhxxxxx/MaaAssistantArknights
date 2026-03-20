@@ -66,7 +66,7 @@ jobs:
                 title: ("🎉 New MAA Release:  " + $tag),
                 url: $url,
                 description: $description,
-                color: 5793266,
+                color: 10246582,
                 fields: [
                   { name: "Windows (x64)", value: ("[↗ Download](" + $win_url + ")"), inline: true },
                   { name: "macOS (Universal, dmg)", value: ("[↗ Download](" + $mac_url + ")"), inline: true },
