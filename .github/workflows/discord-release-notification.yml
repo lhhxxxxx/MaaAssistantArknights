@@ -56,7 +56,6 @@ jobs:
 
           PAYLOAD=$(jq -n \
             --arg tag "$TAG" \
-            --arg url "$URL" \
             --arg description "$DESCRIPTION" \
             --arg win_url "$WIN_URL" \
             --arg mac_url "$MAC_URL" \
@@ -64,7 +63,6 @@ jobs:
             '{
               embeds: [{
                 title: ("🎉 New MAA Release:  " + $tag),
-                url: $url,
                 description: $description,
                 color: 10246582,
                 fields: [
