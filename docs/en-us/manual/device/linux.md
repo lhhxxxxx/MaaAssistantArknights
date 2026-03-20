@@ -15,11 +15,21 @@ Choose one of the following installation methods:
 
 ### Using Wine
 
-The MAA WPF GUI can currently be run through Wine.
+The MAA WPF GUI can currently be run through Wine. MAA now uses self-contained deployment with the .NET runtime included.
 
 #### Installation Steps
 
-1. Go to the [.NET download page](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) and download/install the Windows version of .NET **Desktop** Runtime.
+1. Install Visual C++ Redistributable:
+
+   Download and install [Visual C++ Redistributable](https://aka.ms/vc14/vc_redist.x64.exe):
+
+   ```shell
+   wine vc_redist.x64.exe
+   ```
+
+   ::: tip
+   `DependencySetup_依赖库安装.bat` relies on winget and Windows privilege escalation, which typically doesn't work properly in Wine, so manual installation of runtime libraries is required.
+   :::
 
 2. Download the Windows version of MAA, extract it, and run `wine MAA.exe`.
 

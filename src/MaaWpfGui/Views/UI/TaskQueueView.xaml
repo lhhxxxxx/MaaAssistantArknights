@@ -9,6 +9,7 @@
     xmlns:hc="https://handyorg.github.io/handycontrol"
     xmlns:helper="clr-namespace:MaaWpfGui.Helper"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:enums="clr-namespace:MaaWpfGui.Constants.Enums"
     xmlns:properties="clr-namespace:MaaWpfGui.Styles.Properties"
     xmlns:s="https://github.com/canton7/Stylet"
     xmlns:taskQueue="clr-namespace:MaaWpfGui.Views.UserControl.TaskQueue"
@@ -78,19 +79,19 @@
                                                 <Setter Property="Opacity" Value="1" />
                                                 <Style.Triggers>
                                                     <!--  运行中 - 蓝色  -->
-                                                    <DataTrigger Binding="{Binding Status}" Value="1">
-                                                        <Setter Property="Background" Value="{DynamicResource TaskQueue.TaskStatus.InProgress}" />
+                                                    <DataTrigger Binding="{Binding StatusDisplay}" Value="{x:Static enums:TaskItemStatus.InProgress}">
+                                                        <Setter Property="Background" Value="{DynamicResource TaskQueue.TaskItemStatus.InProgress}" />
                                                     </DataTrigger>
                                                     <!--  成功完成 - 绿色  -->
-                                                    <DataTrigger Binding="{Binding Status}" Value="2">
-                                                        <Setter Property="Background" Value="{DynamicResource TaskQueue.TaskStatus.Completed}" />
+                                                    <DataTrigger Binding="{Binding StatusDisplay}" Value="{x:Static enums:TaskItemStatus.Completed}">
+                                                        <Setter Property="Background" Value="{DynamicResource TaskQueue.TaskItemStatus.Completed}" />
                                                     </DataTrigger>
                                                     <!--  出现错误 - 红色  -->
-                                                    <DataTrigger Binding="{Binding Status}" Value="3">
-                                                        <Setter Property="Background" Value="{DynamicResource TaskQueue.TaskStatus.Error}" />
+                                                    <DataTrigger Binding="{Binding StatusDisplay}" Value="{x:Static enums:TaskItemStatus.Error}">
+                                                        <Setter Property="Background" Value="{DynamicResource TaskQueue.TaskItemStatus.Error}" />
                                                     </DataTrigger>
                                                     <!--  已跳过 - 灰色  -->
-                                                    <DataTrigger Binding="{Binding Status}" Value="4">
+                                                    <DataTrigger Binding="{Binding StatusDisplay}" Value="{x:Static enums:TaskItemStatus.Skipped}">
                                                         <Setter Property="Opacity" Value="0.5" />
                                                     </DataTrigger>
                                                 </Style.Triggers>
@@ -206,6 +207,13 @@
                                 <Style BasedOn="{StaticResource NoSelectedHighlightListBoxItemStyle}" TargetType="{x:Type ListBoxItem}">
                                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
                                     <Setter Property="Padding" Value="0" />
+                                    <Setter Property="MinHeight" Value="24.5" />
+                                    <Setter Property="Height" Value="Auto" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{c:Binding 'Items.Count > 9', RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" Value="True">
+                                            <Setter Property="MaxHeight" Value="{c:Binding 'ActualHeight / (Items.Count + 1.5) less 24.5 ? 24.5 : ActualHeight / (Items.Count + 1.5)', RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
                                 </Style>
                             </ListBox.ItemContainerStyle>
                         </ListBox>
@@ -282,7 +290,12 @@
                                             Padding="0,3"
                                             Command="{s:Action AddTaskQueueTask}"
                                             CommandParameter="{Binding TaskTypeList[8].Value}"
-                                            Header="{Binding TaskTypeList[8].Display}"
+                                            Header="{Binding TaskTypeList[8].Display}" />
+                                        <MenuItem
+                                            Padding="0,3"
+                                            Command="{s:Action AddTaskQueueTask}"
+                                            CommandParameter="{Binding TaskTypeList[9].Value}"
+                                            Header="{Binding TaskTypeList[9].Display}"
                                             Visibility="{c:Binding ShowDebugTask}" />
                                     </ContextMenu>
                                 </hc:ContextMenuButton.Menu>
@@ -487,6 +500,12 @@
                                                                                   AncestorType={x:Type UserControl}}}" />
                         <taskQueue:RoguelikeSettingsUserControl DataContext="{Binding RoguelikeTask}" Visibility="{c:Binding DataContext.TaskSettingVisibilities.Roguelike, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}" />
                         <taskQueue:ReclamationSettingsUserControl DataContext="{Binding ReclamationTask}" Visibility="{c:Binding DataContext.TaskSettingVisibilities.Reclamation, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}" />
+                        <taskQueue:UserDataUpdateSettingsUserControl
+                            DataContext="{Binding UserDataUpdateTask}"
+                            IsEnabled="{Binding DataContext.Idle, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}"
+                            Visibility="{c:Binding DataContext.TaskSettingVisibilities.UserDataUpdate,
+                                                   RelativeSource={RelativeSource Mode=FindAncestor,
+                                                                                  AncestorType={x:Type UserControl}}}" />
                         <taskQueue:CustomUserControl DataContext="{Binding CustomTask}" Visibility="{c:Binding DataContext.TaskSettingVisibilities.Custom, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}" />
                         <taskQueue:PostActionUserControl DataContext="{Binding PostActionSetting}" Visibility="{c:Binding DataContext.TaskSettingVisibilities.PostAction, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType={x:Type UserControl}}}" />
                     </hc:SimpleStackPanel>
@@ -533,7 +552,7 @@
                             <controls:TooltipBlock.TooltipText>
                                 <MultiBinding StringFormat="{}{0}&#x0a;{1}: {2}">
                                     <Binding Source="{StaticResource InventoryUpdateTip}" />
-                                    <Binding Source="{StaticResource LastDepotSyncTime}" />
+                                    <Binding Source="{StaticResource LastSyncTime}" />
                                     <Binding Path="LastDepotSyncTimeText" Source="{x:Static helper:Instances.ToolboxViewModel}" />
                                 </MultiBinding>
                             </controls:TooltipBlock.TooltipText>
@@ -574,31 +593,25 @@
                             Visibility="{c:Binding 'DownloadLogItemViewModel.Content.Length > 0'}">
                             <ContentControl.ContentTemplate>
                                 <DataTemplate>
-                                    <Border
-                                        MaxWidth="420"
-                                        Margin="0,0,0,2.5"
-                                        Padding="5,0,1,5"
-                                        Background="{DynamicResource MouseOverRegionBrushOpacity10}"
-                                        BorderBrush="{DynamicResource BorderBrush}"
-                                        BorderThickness="1"
-                                        CornerRadius="4">
-                                        <Grid>
+                                    <StackPanel>
+                                        <Grid Visibility="{c:Binding !UseCardLog, Source={x:Static ui_vms:SettingsViewModel.GuiSettings}}">
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="*" />
                                             </Grid.ColumnDefinitions>
-                                            <Grid Width="60">
-                                                <controls:TextBlock
-                                                    Grid.Row="0"
-                                                    Margin="0,5,0,0"
-                                                    HorizontalAlignment="Center"
-                                                    Foreground="{DynamicResource TraceLogBrush}"
-                                                    Text="{Binding Time}"
-                                                    TextWrapping="Wrap" />
-                                            </Grid>
+
+                                            <!--  时间  -->
+                                            <controls:TextBlock
+                                                Grid.Column="0"
+                                                Margin="0,5,10,5"
+                                                VerticalAlignment="Top"
+                                                Foreground="{DynamicResource TraceLogBrush}"
+                                                Text="{Binding Time}" />
+
+                                            <!--  内容  -->
                                             <Grid
                                                 Grid.Column="1"
-                                                Margin="10,0,0,0"
+                                                Margin="0,5"
                                                 HorizontalAlignment="Left"
                                                 ToolTip="{Binding ToolTip}"
                                                 ToolTipService.InitialShowDelay="200">
@@ -607,8 +620,6 @@
                                                     <ColumnDefinition Width="Auto" />
                                                 </Grid.ColumnDefinitions>
                                                 <controls:TextBlock
-                                                    Grid.Column="0"
-                                                    Margin="0,5,0,0"
                                                     FontWeight="{Binding Weight}"
                                                     ForegroundKey="{Binding Color}"
                                                     Text="{Binding DisplayContent}"
@@ -622,7 +633,58 @@
                                                     Visibility="{c:Binding ShowToolTip}" />
                                             </Grid>
                                         </Grid>
-                                    </Border>
+                                        <Border
+                                            MaxWidth="420"
+                                            Margin="0,0,0,2.5"
+                                            Padding="5,0,1,5"
+                                            Background="{DynamicResource MouseOverRegionBrushOpacity10}"
+                                            BorderBrush="{DynamicResource BorderBrush}"
+                                            BorderThickness="1"
+                                            CornerRadius="4"
+                                            Visibility="{c:Binding UseCardLog,
+                                                                   Source={x:Static ui_vms:SettingsViewModel.GuiSettings}}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+                                                <Grid Width="60">
+                                                    <controls:TextBlock
+                                                        Grid.Row="0"
+                                                        Margin="0,5,0,0"
+                                                        HorizontalAlignment="Center"
+                                                        Foreground="{DynamicResource TraceLogBrush}"
+                                                        Text="{Binding Time}"
+                                                        TextWrapping="Wrap" />
+                                                </Grid>
+                                                <Grid
+                                                    Grid.Column="1"
+                                                    Margin="10,0,0,0"
+                                                    HorizontalAlignment="Left"
+                                                    ToolTip="{Binding ToolTip}"
+                                                    ToolTipService.InitialShowDelay="200">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <controls:TextBlock
+                                                        Grid.Column="0"
+                                                        Margin="0,5,0,0"
+                                                        FontWeight="{Binding Weight}"
+                                                        ForegroundKey="{Binding Color}"
+                                                        Text="{Binding DisplayContent}"
+                                                        TextWrapping="Wrap" />
+                                                    <controls:TooltipBlock
+                                                        Grid.Column="1"
+                                                        Margin="10,0,0,0"
+                                                        PathDate="{StaticResource LogToolTip}"
+                                                        PathStrokeThickness="1.5"
+                                                        TextBlockText=""
+                                                        Visibility="{c:Binding ShowToolTip}" />
+                                                </Grid>
+                                            </Grid>
+                                        </Border>
+                                    </StackPanel>
                                 </DataTemplate>
                             </ContentControl.ContentTemplate>
                         </ContentControl>

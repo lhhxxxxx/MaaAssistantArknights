@@ -12,12 +12,14 @@
 // </copyright>
 
 #nullable enable
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using MaaWpfGui.Configuration.Single.MaaTask;
 using MaaWpfGui.Constants;
 using MaaWpfGui.Constants.Enums;
 using MaaWpfGui.Helper;
 using MaaWpfGui.Main;
+using MaaWpfGui.Models;
 using MaaWpfGui.Models.AsstTasks;
 using MaaWpfGui.ViewModels.UI;
 using Newtonsoft.Json.Linq;
@@ -45,9 +47,15 @@ public class StartUpSettingsUserControlModel : TaskSettingsViewModel, StartUpSet
 
     // UI 绑定的方法
     [UsedImplicitly]
-    public void AccountSwitchManualRun()
+    public async void AccountSwitchManualRun()
     {
-        _ = Instances.TaskQueueViewModel.QuickSwitchAccount();
+        if (TaskSettingVisibilityInfo.CurrentTask is not StartUpTask startUp)
+        {
+            Instances.TaskQueueViewModel.AddLog("Current task is not StartUpTask", UiLogColor.Error);
+            return;
+        }
+        var task = new StartUpTask() { AccountName = startUp.AccountName };
+        await Instances.TaskQueueViewModel.LinkStartWithTasks([task]);
     }
 
     public override void ProcSubTaskMsg(AsstMsg msg, JObject details)
@@ -66,15 +74,15 @@ public class StartUpSettingsUserControlModel : TaskSettingsViewModel, StartUpSet
         }
     }
 
-    public override bool? SerializeTask(BaseTask? baseTask, int? taskId = null) => (this as ISerialize)?.Serialize(baseTask, taskId);
+    public override (bool? IsSuccess, IEnumerable<int> TaskId) SerializeTask(BaseTask? baseTask, int? taskId = null) => (this as ISerialize).Serialize(baseTask, taskId);
 
     private interface ISerialize : ITaskQueueModelSerialize
     {
-        bool? ITaskQueueModelSerialize.Serialize(BaseTask? baseTask, int? taskId)
+        (bool? IsSuccess, IEnumerable<int> TaskId) ITaskQueueModelSerialize.Serialize(BaseTask? baseTask, int? taskId)
         {
             if (baseTask is not StartUpTask startUp)
             {
-                return null;
+                return (null, []);
             }
 
             var clientType = SettingsViewModel.GameSettings.ClientType;
@@ -90,9 +98,9 @@ public class StartUpSettingsUserControlModel : TaskSettingsViewModel, StartUpSet
             };
 
             return taskId switch {
-                int id when id > 0 => Instances.AsstProxy.AsstSetTaskParamsEncoded(id, task),
-                null => Instances.AsstProxy.AsstAppendTaskWithEncoding(TaskType.StartUp, task),
-                _ => null,
+                int id when id > 0 => (Instances.AsstProxy.AsstSetTaskParamsEncoded(id, task), [id]),
+                null => FromSingle(Instances.AsstProxy.AsstAppendTaskWithEncoding(TaskType.StartUp, task)),
+                _ => (null, []),
             };
         }
     }

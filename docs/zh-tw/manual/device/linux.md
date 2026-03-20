@@ -15,11 +15,21 @@ icon: teenyicons:linux-alt-solid
 
 ### 使用 Wine
 
-MAA WPF GUI 當前可以透過 Wine 執行。
+MAA WPF GUI 當前可以透過 Wine 執行。MAA 已採用自包含部署方式，內建了 .NET 執行環境。
 
 #### 安裝步驟
 
-1. 前往 [.NET 發佈頁](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) 下載並安裝 Windows 版 .NET **桌面**執行環境 (Runtime)。
+1. 安裝 Visual C++ Redistributable：
+
+   下載並安裝 [Visual C++ 可再發行套件](https://aka.ms/vc14/vc_redist.x64.exe)：
+
+   ```shell
+   wine vc_redist.x64.exe
+   ```
+
+   ::: tip
+   `DependencySetup_依赖库安装.bat` 基於 winget 和 Windows 提權機制，通常無法在 Wine 中正常工作，因此需要手動安裝執行庫。
+   :::
 
 2. 下載 Windows 版 MAA，解壓縮後執行 `wine MAA.exe`。
 

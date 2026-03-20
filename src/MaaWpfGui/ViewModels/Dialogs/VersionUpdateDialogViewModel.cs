@@ -180,22 +180,29 @@ public class VersionUpdateDialogViewModel : Screen
     private string? _mirrorcVersionName;
     private string? _mirrorcReleaseNote;
 
+    public static bool HasPendingUpdatePackage()
+    {
+        string updateTag = ConfigurationHelper.GetGlobalValue(ConfigurationKeys.VersionName, string.Empty);
+        string updatePackageName = ConfigurationHelper.GetGlobalValue(ConfigurationKeys.VersionUpdatePackage, string.Empty);
+        return updateTag != string.Empty && updatePackageName != string.Empty && File.Exists(updatePackageName);
+    }
+
     /// <summary>
     /// 检查是否有已下载的更新包
     /// </summary>
     /// <returns>操作成功返回 <see langword="true"/>，反之则返回 <see langword="false"/>。</returns>
     public bool CheckAndUpdateNow()
     {
-        if (UpdateTag == string.Empty || UpdatePackageName == string.Empty || !File.Exists(UpdatePackageName))
+        return TryApplyPendingUpdatePackage();
+    }
+
+    public static bool TryApplyPendingUpdatePackage()
+    {
+        string updateTag = ConfigurationHelper.GetGlobalValue(ConfigurationKeys.VersionName, string.Empty);
+        string updatePackageName = ConfigurationHelper.GetGlobalValue(ConfigurationKeys.VersionUpdatePackage, string.Empty);
+        if (updateTag == string.Empty || updatePackageName == string.Empty || !File.Exists(updatePackageName))
         {
             return false;
-        }
-
-        {
-            using var toast = new ToastNotification(LocalizationHelper.GetString("NewVersionZipFileFoundTitle"));
-            toast.AppendContentText(LocalizationHelper.GetString("NewVersionZipFileFoundDescDecompressing"))
-                .AppendContentText(UpdateTag)
-                .ShowUpdateVersion(row: 2);
         }
 
         string curDir = PathsHelper.BaseDir;
@@ -210,17 +217,11 @@ public class VersionUpdateDialogViewModel : Screen
                 Directory.Delete(extractDir, true);
             }
 
-            ZipFile.ExtractToDirectory(UpdatePackageName, extractDir);
+            ZipFile.ExtractToDirectory(updatePackageName, extractDir);
         }
         catch (InvalidDataException)
         {
-            File.Delete(UpdatePackageName);
-            {
-                using var toast = new ToastNotification(LocalizationHelper.GetString("NewVersionZipFileBrokenTitle"));
-                toast.AppendContentText(LocalizationHelper.GetString("NewVersionZipFileBrokenDescFilename") + UpdatePackageName)
-                    .AppendContentText(LocalizationHelper.GetString("NewVersionZipFileBrokenDescDeleted"))
-                    .ShowUpdateVersion();
-            }
+            File.Delete(updatePackageName);
 
             return false;
         }
@@ -346,11 +347,11 @@ public class VersionUpdateDialogViewModel : Screen
 
         // 操作完了，把解压的文件删了
         Directory.Delete(extractDir, true);
-        File.Delete(UpdatePackageName);
+        File.Delete(updatePackageName);
 
         // 保存更新信息，下次启动后会弹出已更新完成的提示
-        UpdatePackageName = string.Empty;
-        IsFirstBootAfterUpdate = true;
+        ConfigurationHelper.SetGlobalValue(ConfigurationKeys.VersionUpdatePackage, string.Empty);
+        ConfigurationHelper.SetGlobalValue(ConfigurationKeys.VersionUpdateIsFirstBoot, bool.TrueString);
         return true;
 
         static void DeleteFileWithBackup(string filePath)

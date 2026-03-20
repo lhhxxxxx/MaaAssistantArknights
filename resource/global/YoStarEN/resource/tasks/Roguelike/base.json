@@ -63,9 +63,9 @@
             ["Tourist Squad", "游客分队"],
             ["Sui Regulator Squad", "司岁台分队"],
             ["Tianshi Bureau Squad", "天师府分队"],
-            ["Cluster of Blooms Squad__DLC__", "花团锦簇分队"],
-            ["Daring Gambit Squad__DLC__", "棋行险着分队"],
-            ["Echoes of Time Squad__DLC__", "岁影回音分队"]
+            ["Blooming Flowers Squad", "花团锦簇分队"],
+            ["Perilous Game Squad", "棋行险着分队"],
+            ["Sui's Shadow Squad", "岁影回音分队"]
         ]
     },
     "RoguelikeFormationOcr": {
@@ -917,7 +917,21 @@
             ["Risk:WestLianzhenMt.?", "厉-西廉贞"],
             ["Risk:Wild Passion", "厉-恣狂情"],
             ["Rusty", "锈色"],
-            ["Survival", "存护"]
+            ["Survival", "存护"],
+            ["Broken Wand - Absorb", "断杖-汲取"],
+            ["Trade can be explored", "易与可探索"],
+            ["Tzu-Wu Blade", "子武剑"],
+            ["Great Tomb Whistle", "镇陵哨"],
+            ["Hai-Shih Stove", "亥食灶"],
+            ["Leisure can be explored", "常乐可探索"],
+            ["Inkless Scroll", "无墨长卷"],
+            ["Wei-Chien Rule", "未建尺"],
+            ["Legend can be explored", "传说可探索"],
+            ["Turmoil can be explored", "祸乱可探索"],
+            ["Shen-Chu Wheel", "申铸轮"],
+            ["Unsealed Case", "无封长盒"],
+            ["Yin-Shih Flask", "寅诗壶"],
+            ["Wu-Shang Shuttle", "午商梭"]
         ]
     },
     "Roguelike@ChooseDifficultyConfirm": {
@@ -1192,7 +1206,11 @@
             ["AChancetoLive", "生机"],
             ["HundredClanRebellion", "百氏之乱"],
             ["TheFinishingStroke", "收笔"],
-            ["MeetingaFriend", "会友"]
+            ["MeetingaFriend", "会友"],
+            ["Times Change", "移时换物"],
+            ["Where Then Meets Now", "古今交汇"],
+            ["Heaven-Blessed Hunt", "大狩维天"],
+            ["For Tomorrow", "只为明日"]
         ],
         "roi": [0, 395, 725, 235]
     },

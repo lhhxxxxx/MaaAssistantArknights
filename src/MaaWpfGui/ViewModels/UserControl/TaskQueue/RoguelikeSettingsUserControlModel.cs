@@ -1052,15 +1052,15 @@ public class RoguelikeSettingsUserControlModel : TaskSettingsViewModel, Roguelik
         }
     }
 
-    public override bool? SerializeTask(BaseTask? baseTask, int? taskId = null) => (this as ISerialize)?.Serialize(baseTask, taskId);
+    public override (bool? IsSuccess, IEnumerable<int> TaskId) SerializeTask(BaseTask? baseTask, int? taskId = null) => (this as ISerialize).Serialize(baseTask, taskId);
 
     private interface ISerialize : ITaskQueueModelSerialize
     {
-        bool? ITaskQueueModelSerialize.Serialize(BaseTask? baseTask, int? taskId)
+        (bool? IsSuccess, IEnumerable<int> TaskId) ITaskQueueModelSerialize.Serialize(BaseTask? baseTask, int? taskId)
         {
             if (baseTask is not RoguelikeTask roguelike)
             {
-                return null;
+                return (null, []);
             }
 
             bool roguelikeSquadIsProfessional = roguelike.Mode == Mode.Collectible && roguelike.Theme != Theme.Phantom && roguelike.Squad is "突击战术分队" or "堡垒战术分队" or "远程战术分队" or "破坏战术分队";
@@ -1136,9 +1136,9 @@ public class RoguelikeSettingsUserControlModel : TaskSettingsViewModel, Roguelik
             }
 
             return taskId switch {
-                int id when id > 0 => Instances.AsstProxy.AsstSetTaskParamsEncoded(id, task),
-                null => Instances.AsstProxy.AsstAppendTaskWithEncoding(TaskType.Roguelike, task),
-                _ => null,
+                int id when id > 0 => (Instances.AsstProxy.AsstSetTaskParamsEncoded(id, task), [id]),
+                null => FromSingle(Instances.AsstProxy.AsstAppendTaskWithEncoding(TaskType.Roguelike, task)),
+                _ => (null, []),
             };
         }
     }

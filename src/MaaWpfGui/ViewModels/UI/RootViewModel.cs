@@ -37,13 +37,6 @@ public class RootViewModel : Conductor<Screen>.Collection.OneActive
     /// <inheritdoc/>
     protected override void OnViewLoaded()
     {
-        // 更新直接重启
-        if (Instances.VersionUpdateDialogViewModel.CheckAndUpdateNow())
-        {
-            Bootstrapper.RestartAfterUpdate();
-            return;
-        }
-
         InitViewModels();
         _ = InitProxy();
         if (SettingsViewModel.VersionUpdateSettings.VersionType == VersionUpdateSettingsUserControlModel.UpdateVersionType.Nightly &&

@@ -41,7 +41,40 @@
                 Cursor="Hand"
                 NavigateUri="{Binding Source={x:Static constants:MaaUrls.YostarENResolution}}"
                 TextDecorations="None">
-                <TextBlock Text="{DynamicResource ResolutionInfoYoStarEN}" />
+                <TextBlock Text="{DynamicResource ResolutionInfoYoStarEN}">
+                    <TextBlock.Foreground>
+                        <LinearGradientBrush SpreadMethod="Repeat">
+                            <LinearGradientBrush.Transform>
+                                <TranslateTransform x:Name="ResolutionInfoLinearGradientBrushTranslate" />
+                            </LinearGradientBrush.Transform>
+                            <LinearGradientBrush.GradientStops>
+                                <GradientStop Offset="0.000" Color="Red" />
+                                <GradientStop Offset="0.143" Color="Orange" />
+                                <GradientStop Offset="0.286" Color="Gold" />
+                                <GradientStop Offset="0.429" Color="Green" />
+                                <GradientStop Offset="0.571" Color="DodgerBlue" />
+                                <GradientStop Offset="0.714" Color="BlueViolet" />
+                                <GradientStop Offset="0.857" Color="Magenta" />
+                                <GradientStop Offset="1.000" Color="Red" />
+                            </LinearGradientBrush.GradientStops>
+                        </LinearGradientBrush>
+                    </TextBlock.Foreground>
+                    <TextBlock.Triggers>
+                        <EventTrigger RoutedEvent="TextBlock.Loaded">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation
+                                        RepeatBehavior="Forever"
+                                        Storyboard.TargetName="ResolutionInfoLinearGradientBrushTranslate"
+                                        Storyboard.TargetProperty="X"
+                                        From="0"
+                                        To="4000"
+                                        Duration="0:0:20" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </TextBlock.Triggers>
+                </TextBlock>
             </Hyperlink>
         </controls:TextBlock>
         <controls:TextBlock

@@ -69,6 +69,11 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
     public static FightSettingsUserControlModel Instance { get; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether a stage plan item is being dragged.
+    /// </summary>
+    public bool IsDragging { get => field; set => SetAndNotify(ref field, value); }
+
+    /// <summary>
     /// Gets or private sets the list of stages.
     /// </summary>
     public ObservableCollection<StageSourceItem> StageListSource { get => field; private set => SetAndNotify(ref field, value); } = [];
@@ -660,7 +665,6 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
     public static string? GetFightStage(IEnumerable<string> list)
     {
         var stage = list?.FirstOrDefault(s => Instances.StageManager.IsStageOpen(s, Instances.TaskQueueViewModel.CurDayOfWeek));
-        stage ??= list?.FirstOrDefault();
         _logger.Information("GetFightStage: from {list}, selected {stage}", list, stage);
         return stage;
     }
@@ -691,14 +695,14 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
             return null;
         }
 
-        if (ConfigFactory.CurrentConfig.TaskQueue.IndexOf(fight) is int index && index > -1 && Instances.TaskQueueViewModel.TaskItemViewModels[index].TaskId > 0)
+        if (ConfigFactory.CurrentConfig.TaskQueue.IndexOf(fight) is int index && index > -1 && Instances.TaskQueueViewModel.TaskItemViewModels[index].TaskIds.Count > 0)
         {
-            return SerializeTask(fight, Instances.TaskQueueViewModel.TaskItemViewModels[index].TaskId);
+            return SerializeTask(fight, Instances.TaskQueueViewModel.TaskItemViewModels[index].TaskIds[0]).IsSuccess;
         }
         return null;
     }
 
-    public override bool? SerializeTask(BaseTask? baseTask, int? taskId = null) => (this as ISerialize).Serialize(baseTask, taskId);
+    public override (bool? IsSuccess, IEnumerable<int> TaskId) SerializeTask(BaseTask? baseTask, int? taskId = null) => (this as ISerialize).Serialize(baseTask, taskId);
 
     #region 关卡列表更新
 
@@ -779,6 +783,7 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
         }
         StagePlan = new ObservableCollection<StagePlanItem>(list);
         StagePlan.CollectionChanged += (_, __) => SaveStagePlan();
+        SetFightParams(); // 恢复StagePlan后, 修复AsstFightTask的Stage
     }
 
     private void SaveStagePlan()
@@ -907,23 +912,23 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
 
     private interface ISerialize : ITaskQueueModelSerialize
     {
-        bool? ITaskQueueModelSerialize.Serialize(BaseTask? baseTask, int? taskId)
+        (bool? IsSuccess, IEnumerable<int> TaskId) ITaskQueueModelSerialize.Serialize(BaseTask? baseTask, int? taskId)
         {
             if (baseTask is not FightTask fight || taskId is int and <= 0)
             {
-                return null;
+                return (null, []);
             }
 
             if (fight.UseWeeklySchedule && fight.WeeklySchedule.TryGetValue(Instances.TaskQueueViewModel.CurDayOfWeek, out var isEnabled) && !isEnabled)
             {
-                return null;
+                return (null, []);
             }
 
             using var scope = _lock.EnterScope();
             var stage = FightSettingsUserControlModel.GetFightStage(fight.StagePlan);
             if (stage is null)
             {
-                return null;
+                return (null, []);
             }
             var task = new AsstFightTask() {
                 Stage = stage,
@@ -957,9 +962,9 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
             }
 
             return taskId switch {
-                int id when id > 0 => Instances.AsstProxy.AsstSetTaskParamsEncoded(id, task),
-                null => Instances.AsstProxy.AsstAppendTaskWithEncoding(TaskType.Fight, task),
-                _ => null,
+                int id when id > 0 => (Instances.AsstProxy.AsstSetTaskParamsEncoded(id, task), [id]),
+                null => FromSingle(Instances.AsstProxy.AsstAppendTaskWithEncoding(TaskType.Fight, task)),
+                _ => (null, []),
             };
         }
     }

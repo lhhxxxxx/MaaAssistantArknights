@@ -178,6 +178,7 @@ To customize rotation schedules, please use ｢{key=InfrastModeCustom}｣.</syst
     <system:String x:Key="BlueStacks">BlueStacks</system:String>
     <system:String x:Key="MuMuEmulator12">MuMu Emulator 12</system:String>
     <system:String x:Key="LDPlayer">LD Player</system:String>
+    <system:String x:Key="AVD">Android Virtual Device (AVD)</system:String>
     <system:String x:Key="Nox">Nox</system:String>
     <system:String x:Key="XYAZ">MEmu</system:String>
     <system:String x:Key="WSA">Old version of WSA</system:String>
@@ -248,9 +249,9 @@ To customize rotation schedules, please use ｢{key=InfrastModeCustom}｣.</syst
     <system:String x:Key="IS5NewSquad3">Tourist Squad</system:String>
     <system:String x:Key="IS5NewSquad4">Sui Regulator Squad</system:String>
     <system:String x:Key="IS5NewSquad5">Tianshi Bureau Squad</system:String>
-    <system:String x:Key="IS5NewSquad6">Cluster of Blooms Squad (花团锦簇分队)</system:String>
-    <system:String x:Key="IS5NewSquad7">Daring Gambit Squad (棋行险着分队)</system:String>
-    <system:String x:Key="IS5NewSquad8">Echoes of Time Squad (岁影回音分队)</system:String>
+    <system:String x:Key="IS5NewSquad6">Blooming Flowers Squad</system:String>
+    <system:String x:Key="IS5NewSquad7">Perilous Game Squad</system:String>
+    <system:String x:Key="IS5NewSquad8">Sui's Shadow Squad</system:String>
     <system:String x:Key="IS5NewSquad9">Agent Squad (代理人分队)</system:String>
     <system:String x:Key="IS5NewSquad10">Knowledge Squad (知学分队)</system:String>
     <system:String x:Key="IS5NewSquad11">Merchant Squad (商贾分队)</system:String>
@@ -452,6 +453,7 @@ If you are concerned about leftover entries, please disable this option before d
     <system:String x:Key="MiniTouchMode">Minitouch (Default)</system:String>
     <system:String x:Key="MaaTouchMode">MaaTouch (Experimental)</system:String>
     <system:String x:Key="AdbTouchMode">ADB Input (Deprecated)</system:String>
+    <system:String x:Key="MaaFwAdbTouchMode">MaaFramework (Experimental)</system:String>
     <system:String x:Key="AdditionCommand">Additional command arguments</system:String>
     <system:String x:Key="AdditionCommandTip" xml:space="preserve">Additional commands for emulator parameters (e.g. ｢--instance 1｣ for instance 1).&#10;Command formats vary by emulator, typically including instance numbers and window modes, please consult your emulator's documentation.</system:String>
     <system:String x:Key="StartsWithScript">Starts with Script</system:String>
@@ -688,6 +690,7 @@ If the game is launched in portrait mode and then switched to landscape, it may 
     <system:String x:Key="AutoRoguelike">Auto I.S.</system:String>
     <system:String x:Key="Roguelike">{key=AutoRoguelike}</system:String>
     <system:String x:Key="Reclamation">Reclamation Algorithm</system:String>
+    <system:String x:Key="UserDataUpdate">Update User Data</system:String>
     <system:String x:Key="MiniGame">Mini-Games</system:String>
     <system:String x:Key="Custom">Custom Task</system:String>
     <system:String x:Key="SingleStep">Single-Step Task</system:String>
@@ -846,7 +849,7 @@ Right Click: Select Target Process</system:String>
     <!--  Depot Recognition  -->
     <system:String x:Key="DepotRecognition">Depot</system:String>
     <system:String x:Key="Depot">{key=DepotRecognition}</system:String>
-    <system:String x:Key="LastDepotSyncTime">Last Sync Time</system:String>
+    <system:String x:Key="LastSyncTime">Last Sync Time</system:String>
     <system:String x:Key="DepotRecognitionTip">This function is still in testing. If you encounter any unexpected results, please zip the ｢debug/depot｣ folder in the installation path and submit an issue on GitHub</system:String>
     <system:String x:Key="StartToDepotRecognition">Start to Identify</system:String>
     <system:String x:Key="ExportToArkplanner">Export to Arkplanner</system:String>
@@ -1058,9 +1061,9 @@ Right-click to clear inactive jobs</system:String>
     <system:String x:Key="CopilotCouldNotSaveFile" xml:space="preserve">Could not save copilot task to file: </system:String>
     <system:String x:Key="CopilotStartWithEmptyList">Using ｢{key=UseCopilotList}｣, but no tasks have been added</system:String>
     <system:String x:Key="CopilotSingleTaskWarning">You're using ｢{key=UseCopilotList}｣ to execute a single task, which is not recommended. For single tasks, please run them directly instead.</system:String>
-    <system:String x:Key="CopilotTaskListMixedModeNotAllowed">You're using ｢{key=UseCopilotList}｣, but mixing ｢{key=MainStageStoryCollectionSideStory}｣ and ｢{key=ParadoxSimulation}｣ is not allowed. Please create separate lists under the corresponding tabs before starting.</system:String>
-    <system:String x:Key="CopilotTaskListLegacyItemNotSupported">You're using ｢{key=UseCopilotList}｣, but the list contains legacy items (missing tab info). Please re-add these tasks under the correct tab before starting.</system:String>
-    <system:String x:Key="CopilotTaskListTabMismatch">You're using ｢{key=UseCopilotList}｣. Current tab is ｢{0}｣, but the list is from ｢{1}｣. Please switch to the corresponding tab before starting.</system:String>
+    <system:String x:Key="CopilotTaskListMixedModeNotAllowed">Currently using ｢{key=UseCopilotList}｣. Mixing different job types is not supported.</system:String>
+    <system:String x:Key="CopilotTaskTypeParseFailedSkipCheck">Failed to parse some job types. Skipping type checks.</system:String>
+    <system:String x:Key="CopilotIllegalOperName">Illegal operator name: {0}</system:String>
     <!--  !Logs  -->
     <!--  !Copilot  -->
     <!--  ErrorView  -->
@@ -1221,6 +1224,10 @@ Right-click to clear inactive jobs</system:String>
     <system:String x:Key="StageInfoError">Stage recognition error</system:String>
     <system:String x:Key="UseFormation">Use formation</system:String>
     <system:String x:Key="Current">Current</system:String>
+    <system:String x:Key="EveryTime">Every Time</system:String>
+    <system:String x:Key="Daily">Daily</system:String>
+    <system:String x:Key="Weekly">Weekly</system:String>
+    <system:String x:Key="UserDataUpdateTriggerInterval">Trigger Interval</system:String>
     <system:String x:Key="BattleFormation">Start formation</system:String>
     <system:String x:Key="BattleFormationParseFailed">Formation parse failed</system:String>
     <system:String x:Key="BattleFormationSelected" xml:space="preserve">Selected:&#160;</system:String>
@@ -1438,8 +1445,13 @@ With save file: farm points through crafting (advanced).
     <system:String x:Key="UnknownDllDetected" xml:space="preserve">Unknown DLL files have been detected in the MAA runtime directory, which may cause DLL hijacking and unexpected consequences.
 Please extract MAA into a separate new folder, or remove any DLL files that do not belong to MAA.
     </system:String>
-    <system:String x:Key="VC++NotInstalled" xml:space="preserve">Detected that Microsoft Visual C++ V14 Redistributable (x64) is NOT installed or the version is too low.
-Click "{key=Confirm}" to execute the installation script and exit MAA. Click "{key=Cancel}" to exit MAA directly.
+    <system:String x:Key="VC++NotInstalled" xml:space="preserve">Failed to load MaaCore.dll. Possible reasons include:
+• Archive not fully extracted, missing necessary DLL files
+• Microsoft Visual C++ V14 Redistributable (x64) not installed or version too low
+• Other system dependencies missing
+
+Please verify that the archive has been fully extracted.
+Click "{key=Confirm}" to attempt installing/updating VC++ runtime and exit MAA (ineffective for other causes). Click "{key=Cancel}" to exit directly.
     </system:String>
     <system:String x:Key="MultiInstanceUnderSamePath" xml:space="preserve">Only one instance can be launched under the same path!
 If you want to run multiple MAA at the same time, please copy the whole MAA and start under different path with the same adb and different connect address.
@@ -1837,9 +1849,16 @@ If you want to run multiple MAA at the same time, please copy the whole MAA and 
     <system:String x:Key="BadModules.ResetSuccess">Hardware rendering mode has been restored. Restart MAA to apply changes. Restart now?</system:String>
     <!--  !BadModules  -->
 
-    <!--  EmulatorPathSelection  -->
+    <!--  ItemSelection  -->
+    <system:String x:Key="SelectItem">Select Item</system:String>
     <system:String x:Key="SelectEmulatorPath">Select Emulator Path</system:String>
+    <system:String x:Key="SelectEmulator">Select Emulator</system:String>
+    <system:String x:Key="SelectConnectionAddress">Select Connection Address</system:String>
     <system:String x:Key="MultipleEmulatorsDetected">Multiple emulator installation paths detected, please select the path you want to use:</system:String>
+    <system:String x:Key="MultipleEmulatorsDetectedForConnection">Multiple emulators detected, please select the emulator you want to connect to:</system:String>
+    <system:String x:Key="MultipleAddressesDetected">Multiple connection addresses detected, please select the address you want to use:</system:String>
     <system:String x:Key="PleaseSelectPath">Please select a path</system:String>
-    <!--  !EmulatorPathSelection  -->
+    <system:String x:Key="PleaseSelectItem">Please select an item</system:String>
+    <system:String x:Key="EmulatorSelectionCancelled">Emulator selection cancelled</system:String>
+    <!--  !ItemSelection  -->
 </ResourceDictionary>

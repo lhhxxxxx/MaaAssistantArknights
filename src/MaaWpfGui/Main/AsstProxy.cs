@@ -441,6 +441,10 @@ public class AsstProxy
             if (args.Action == NotifyCollectionChangedAction.Reset)
             {
                 TaskSettingVisibilityInfo.Instance.NotifyOfTaskStatus();
+                foreach (var i in Instances.TaskQueueViewModel.TaskItemViewModels)
+                {
+                    i.SetTaskIds([]);
+                }
             }
         };
 
@@ -1038,12 +1042,8 @@ public class AsstProxy
         {
             case AsstMsg.TaskChainStopped:
                 Instances.TaskQueueViewModel.SetStopped();
-                UpdateTaskStatus(taskId, TaskStatus.Completed);
-                foreach (var i in Instances.TaskQueueViewModel.TaskItemViewModels)
-                {
-                    i.TaskId = 0;
-                    i.Status = (int)TaskStatus.Idle;
-                }
+
+                // UpdateTaskStatus(taskId, TaskStatus.Completed);
                 _tasksStatus.Clear();
                 break;
 
@@ -1072,7 +1072,7 @@ public class AsstProxy
 
             case AsstMsg.TaskChainStart:
                 {
-                    var taskIndex = Instances.TaskQueueViewModel.TaskItemViewModels.FirstOrDefault(t => t.TaskId == taskId)?.Index ?? -1;
+                    var taskIndex = Instances.TaskQueueViewModel.TaskItemViewModels.FirstOrDefault(i => i.TaskIds.Contains(taskId))?.Index ?? -1;
                     var task = taskIndex >= 0 && taskIndex < ConfigFactory.CurrentConfig.TaskQueue.Count
                         ? ConfigFactory.CurrentConfig.TaskQueue[taskIndex]
                         : null;
@@ -1101,7 +1101,7 @@ public class AsstProxy
                         }
                     }
 
-                    var taskIndex = Instances.TaskQueueViewModel.TaskItemViewModels.FirstOrDefault(t => t.TaskId == taskId)?.Index ?? -1;
+                    var taskIndex = Instances.TaskQueueViewModel.TaskItemViewModels.FirstOrDefault(i => i.TaskIds.Contains(taskId))?.Index ?? -1;
                     var task = taskIndex >= 0 && taskIndex < ConfigFactory.CurrentConfig.TaskQueue.Count
                         ? ConfigFactory.CurrentConfig.TaskQueue[taskIndex]
                         : null;
@@ -1189,11 +1189,6 @@ public class AsstProxy
                 }
 
                 bool buyWine = _tasksStatus.Any(t => t.Value.Type == TaskType.Mall) && Instances.SettingsViewModel.DidYouBuyWine();
-                foreach (var i in Instances.TaskQueueViewModel.TaskItemViewModels)
-                {
-                    i.TaskId = 0;
-                    i.Status = (int)TaskStatus.Idle;
-                }
                 _tasksStatus.Clear();
 
                 Instances.TaskQueueViewModel.ResetAllTemporaryVariable();
@@ -1439,7 +1434,7 @@ public class AsstProxy
                     // 剿灭放弃上传企鹅物流的特殊处理
                     Instances.AsstProxy.TasksStatus.TryGetValue(taskId, out var value);
                     if (value is { Type: TaskType.Fight }
-                        && (Instances.TaskQueueViewModel.TaskItemViewModels.FirstOrDefault(t => t.TaskId == taskId)?.Index ?? -1) is int index and > -1
+                        && Instances.TaskQueueViewModel.TaskItemViewModels.FirstOrDefault(i => i.TaskIds.Contains(taskId))?.Index is int index and > -1
                         && index <= ConfigFactory.CurrentConfig.TaskQueue.Count
                         && ConfigFactory.CurrentConfig.TaskQueue[index] is Configuration.Single.MaaTask.FightTask fight
                         && FightSettingsUserControlModel.GetFightStage(fight.StagePlan) == FightSettingsUserControlModel.AnnihilationName)
@@ -1746,7 +1741,7 @@ public class AsstProxy
                             {
                                 case "EndOfActionThenStop":
                                     {
-                                        var index = Instances.TaskQueueViewModel.TaskItemViewModels.FirstOrDefault(t => t.TaskId == taskId)?.Index ?? -1;
+                                        var index = Instances.TaskQueueViewModel.TaskItemViewModels.FirstOrDefault(i => i.TaskIds.Contains(taskId))?.Index ?? -1;
                                         if (index >= 0 && index < ConfigFactory.CurrentConfig.TaskQueue.Count && ConfigFactory.CurrentConfig.TaskQueue[index] is MallTask mall)
                                         {
                                             mall.CreditFightLastTime = DateTime.UtcNow.ToYjDate().ToFormattedString();
@@ -1758,7 +1753,7 @@ public class AsstProxy
 
                                 case "VisitLimited" or "VisitNextBlack":
                                     {
-                                        var index = Instances.TaskQueueViewModel.TaskItemViewModels.FirstOrDefault(t => t.TaskId == taskId)?.Index ?? -1;
+                                        var index = Instances.TaskQueueViewModel.TaskItemViewModels.FirstOrDefault(i => i.TaskIds.Contains(taskId))?.Index ?? -1;
                                         if (index >= 0 && index < ConfigFactory.CurrentConfig.TaskQueue.Count && ConfigFactory.CurrentConfig.TaskQueue[index] is MallTask mall)
                                         {
                                             mall.VisitFriendsLastTime = DateTime.UtcNow.ToYjDate().ToFormattedString();
@@ -1800,7 +1795,7 @@ public class AsstProxy
                 break;
 
             case "OperBox":
-                Instances.ToolboxViewModel.OperBoxParse((JObject?)subTaskDetails);
+                Instances.ToolboxViewModel.OperBoxParse((JObject?)subTaskDetails, updateSyncTime: true);
                 break;
         }
 
@@ -2804,6 +2799,9 @@ public class AsstProxy
         /// <summary>生息演算</summary>
         Reclamation,
 
+        /// <summary>更新用户数据</summary>
+        UserDataUpdate,
+
         /// <summary>小游戏</summary>
         MiniGame,
 
@@ -2821,11 +2819,16 @@ public class AsstProxy
         TaskType.Award,
         TaskType.Roguelike,
         TaskType.Reclamation,
+        TaskType.UserDataUpdate,
     ];
 
     private readonly ObservableDictionary<AsstTaskId, (TaskType Type, TaskStatus Status)> _tasksStatus = [];
 
     public IReadOnlyDictionary<AsstTaskId, (TaskType Type, TaskStatus Status)> TasksStatus => new Dictionary<AsstTaskId, (TaskType, TaskStatus)>(_tasksStatus);
+
+    public delegate void TaskItemStatusDelegate(int taskId, TaskItemStatus status);
+
+    public event TaskItemStatusDelegate? OnTaskItemStatusChanged;
 
     private bool UpdateTaskStatus(AsstTaskId id, TaskStatus status)
     {
@@ -2846,7 +2849,7 @@ public class AsstProxy
         }
 
         _tasksStatus[id] = (value.Type, status);
-        Instances.TaskQueueViewModel.TaskItemViewModels.FirstOrDefault(item => item.TaskId == id)?.Status = (int)status;
+        OnTaskItemStatusChanged?.Invoke(id, (TaskItemStatus)status);
         if (status == TaskStatus.InProgress)
         {
             TaskSettingVisibilityInfo.Instance.NotifyOfTaskStatus();
@@ -2884,19 +2887,23 @@ public class AsstProxy
     /// <summary>
     /// 仓库识别。
     /// </summary>
+    /// <param name="startImmediately">是否立刻启动。</param>
     /// <returns>是否成功。</returns>
-    public bool AsstStartDepot()
+    public bool AsstStartDepot(bool startImmediately = true)
     {
-        return AsstAppendTaskWithEncoding(TaskType.Depot, AsstTaskType.Depot) && AsstStart();
+        return AsstAppendTaskWithEncoding(TaskType.Depot, AsstTaskType.Depot) &&
+               (!startImmediately || AsstStart());
     }
 
     /// <summary>
     /// 干员识别。
     /// </summary>
+    /// <param name="startImmediately">是否立刻启动。</param>
     /// <returns>是否成功。</returns>
-    public bool AsstStartOperBox()
+    public bool AsstStartOperBox(bool startImmediately = true)
     {
-        return AsstAppendTaskWithEncoding(TaskType.OperBox, AsstTaskType.OperBox) && AsstStart();
+        return AsstAppendTaskWithEncoding(TaskType.OperBox, AsstTaskType.OperBox) &&
+               (!startImmediately || AsstStart());
     }
 
     /// <summary>
@@ -2944,14 +2951,22 @@ public class AsstProxy
     }
     */
 
-    public bool AsstAppendTaskWithEncoding(TaskType wpfTasktype, AsstBaseTask task)
+    public (bool IsSuccess, int TaskId) AsstAppendTaskWithEncoding(TaskType wpfTasktype, AsstBaseTask task)
     {
         return AsstAppendTaskWithEncoding(wpfTasktype, task.Serialize());
     }
 
-    public bool AsstAppendTaskWithEncoding(TaskType wpfTaskType, (AsstTaskType Type, JObject? TaskParams) task)
+    public (bool IsSuccess, int TaskId) AsstAppendTaskWithEncoding(TaskType wpfTaskType, (AsstTaskType Type, JObject? TaskParams) task)
     {
-        return AsstAppendTaskWithEncoding(wpfTaskType, task.Type, task.TaskParams);
+        task.TaskParams ??= [];
+        AsstTaskId id = AsstAppendTask(_handle, task.Type.ToString(), JsonConvert.SerializeObject(task.TaskParams));
+        if (id == 0)
+        {
+            return (false, 0);
+        }
+
+        _tasksStatus.Add(id, (wpfTaskType, TaskStatus.Idle));
+        return (true, id);
     }
 
     public bool AsstAppendTaskWithEncoding(TaskType wpfTaskType, AsstTaskType type, JObject? taskParams = null)

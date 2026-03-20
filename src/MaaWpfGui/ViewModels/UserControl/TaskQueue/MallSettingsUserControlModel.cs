@@ -21,11 +21,8 @@ using MaaWpfGui.Constants;
 using MaaWpfGui.Constants.Enums;
 using MaaWpfGui.Helper;
 using MaaWpfGui.Models.AsstTasks;
-using MaaWpfGui.Services;
 using MaaWpfGui.Utilities.ValueType;
 using MaaWpfGui.ViewModels.UI;
-using MaaWpfGui.ViewModels.UserControl.Settings;
-using Newtonsoft.Json.Linq;
 using static MaaWpfGui.Main.AsstProxy;
 
 namespace MaaWpfGui.ViewModels.UserControl.TaskQueue;
@@ -190,15 +187,15 @@ public class MallSettingsUserControlModel : TaskSettingsViewModel, MallSettingsU
         }
     }
 
-    public override bool? SerializeTask(BaseTask? baseTask, int? taskId = null) => (this as ISerialize)?.Serialize(baseTask, taskId);
+    public override (bool? IsSuccess, IEnumerable<int> TaskId) SerializeTask(BaseTask? baseTask, int? taskId = null) => (this as ISerialize).Serialize(baseTask, taskId);
 
     private interface ISerialize : ITaskQueueModelSerialize
     {
-        bool? ITaskQueueModelSerialize.Serialize(BaseTask? baseTask, int? taskId)
+        (bool? IsSuccess, IEnumerable<int> TaskId) ITaskQueueModelSerialize.Serialize(BaseTask? baseTask, int? taskId)
         {
             if (baseTask is not MallTask mall)
             {
-                return null;
+                return (null, []);
             }
 
             var fightStageEmpty = false;
@@ -243,9 +240,9 @@ public class MallSettingsUserControlModel : TaskSettingsViewModel, MallSettingsU
             };
 
             return taskId switch {
-                int id when id > 0 => Instances.AsstProxy.AsstSetTaskParamsEncoded(id, task),
-                null => Instances.AsstProxy.AsstAppendTaskWithEncoding(TaskType.Mall, task),
-                _ => null,
+                int id when id > 0 => (Instances.AsstProxy.AsstSetTaskParamsEncoded(id, task), [id]),
+                null => FromSingle(Instances.AsstProxy.AsstAppendTaskWithEncoding(TaskType.Mall, task)),
+                _ => (null, []),
             };
 
             string? GetStageForDayOfWeek(FightTask fightTask, DayOfWeek day)

@@ -540,7 +540,7 @@
             ["Spare Timber", "备用木材"],
             ["Shabby Fence", "破旧的木篱"],
             ["Steam Soda Bottle", "水汽汽水瓶"],
-            ["Eyjafja?ll?a the Hv.t Aska?", "纯烬艾雅法拉"],
+            ["Eyjaf?ja?ll?a the Hv.t Aska?", "纯烬艾雅法拉"],
             ["Decorative Geyser", "景观喷泉"],
             ["Swire the Elegant Wit", "琳琅诗怀雅"],
             ["Bryophyta", "苍苔"],
@@ -1010,7 +1010,14 @@
             ["Arts Outpost", "术法岗哨"],
             ["Farmland", "田地"],
             ["Waterside Village", "水产村落"],
-            ["Base Station", "信号基站"]
+            ["Base Station", "信号基站"],
+            ["Rock Wall", "阻道岩壁"],
+            ["Hidden Tunnel", "隐蔽矿道"],
+            ["Ancient Statuegeist", "古雕伥"],
+            ["Mantra", "真言"],
+            ["Vetochki", "折桠"],
+            ["Heavily Polluted Facility", "严重污染设施"],
+            ["Snegurochka", "冬时"]
         ]
     },
     "GameStartCheckResourceOCR": {
@@ -1558,7 +1565,26 @@
             ["Amidst Thunder", "迎雷"],
             ["Clarity", "分明"],
             ["Frivolous Tunes", "靡靡之音"],
-            ["Return to Your Roots", "落叶归根"]
+            ["Return to Your Roots", "落叶归根"],
+            ["Difficult Beginnings", "震坎"],
+            ["Force Redirection", "借力打力"],
+            ["Rescue Mission", "救援行动"],
+            ["Ticket Please", "凭票入内"],
+            ["Pest Control", "驱虫"],
+            ["Rescue Mission", "救援行动"],
+            ["Nanwu Vows", "南武约"],
+            ["Near-Forgotten", "往昔难忆"],
+            ["Toy Soldiers", "玩具兵将"],
+            ["The Last Hunt", "末狩"],
+            ["Toy Soldiers", "玩具兵将"],
+            ["Pest Control", "驱虫"],
+            ["Beyond Mount and Sea", "越山海"],
+            ["A Change of Fate", "天数将易"],
+            ["Beyond Mount and Sea", "越山海"],
+            ["Ticket Please", "凭票入内"],
+            ["Dusk River Sayings", "夕江诀"],
+            ["Force Redirection", "借力打力"],
+            ["Everywhere", "四方"]
         ]
     },
     "BattleQuickFormationClear": {

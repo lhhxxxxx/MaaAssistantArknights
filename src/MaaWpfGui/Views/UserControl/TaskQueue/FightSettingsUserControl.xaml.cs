@@ -11,6 +11,10 @@
 // but WITHOUT ANY WARRANTY
 // </copyright>
 
+using System.Windows;
+using System.Windows.Input;
+using MaaWpfGui.ViewModels.UI;
+
 namespace MaaWpfGui.Views.UserControl.TaskQueue;
 
 /// <summary>
@@ -24,5 +28,28 @@ public partial class FightSettingsUserControl : System.Windows.Controls.UserCont
     public FightSettingsUserControl()
     {
         InitializeComponent();
+    }
+
+    private void DragHandle_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        TaskQueueViewModel.FightTask.IsDragging = true;
+
+        // 拖拽松开时可能不经过 Button，在 Window 层兜底恢复
+        var window = Window.GetWindow(this);
+        window?.PreviewMouseLeftButtonUp += Window_PreviewMouseLeftButtonUp;
+    }
+
+    private void DragHandle_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        TaskQueueViewModel.FightTask.IsDragging = false;
+    }
+
+    private void Window_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        TaskQueueViewModel.FightTask.IsDragging = false;
+        if (sender is Window window)
+        {
+            window.PreviewMouseLeftButtonUp -= Window_PreviewMouseLeftButtonUp;
+        }
     }
 }

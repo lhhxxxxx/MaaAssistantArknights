@@ -13,6 +13,7 @@
 
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using MaaWpfGui.Configuration.Single.MaaTask;
 using MaaWpfGui.Helper;
@@ -70,24 +71,24 @@ public class CustomSettingsUserControlModel : TaskSettingsViewModel, CustomSetti
         }
     }
 
-    public override bool? SerializeTask(BaseTask? baseTask, int? taskId = null) => (this as ISerialize).Serialize(baseTask, taskId);
+    public override (bool? IsSuccess, IEnumerable<int> TaskId) SerializeTask(BaseTask? baseTask, int? taskId = null) => (this as ISerialize).Serialize(baseTask, taskId);
 
     private interface ISerialize : ITaskQueueModelSerialize
     {
-        bool? ITaskQueueModelSerialize.Serialize(BaseTask? baseTask, int? taskId)
+        (bool? IsSuccess, IEnumerable<int> TaskId) ITaskQueueModelSerialize.Serialize(BaseTask? baseTask, int? taskId)
         {
             if (baseTask is not CustomTask custom)
             {
-                return null;
+                return (null, []);
             }
 
             var task = new AsstCustomTask() {
                 CustomTasks = [.. custom.CustomTaskName.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(task => task.Trim())],
             };
             return taskId switch {
-                int id when id > 0 => Instances.AsstProxy.AsstSetTaskParamsEncoded(id, task),
-                null => Instances.AsstProxy.AsstAppendTaskWithEncoding(TaskType.Custom, task),
-                _ => null,
+                int id when id > 0 => (Instances.AsstProxy.AsstSetTaskParamsEncoded(id, task), [id]),
+                null => FromSingle(Instances.AsstProxy.AsstAppendTaskWithEncoding(TaskType.Custom, task)),
+                _ => (null, []),
             };
         }
     }
