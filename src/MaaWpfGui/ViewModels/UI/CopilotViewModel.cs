@@ -2349,6 +2349,10 @@ public partial class CopilotViewModel : Screen
             {
                 return CopilotType.MainStageAndSideStory;
             }
+            else if (SideStoryStageIdRegex().IsMatch(mapInfo.StageId ?? string.Empty))
+            {
+                return CopilotType.MainStageAndSideStory;
+            }
         }
 
         return CopilotType.Unknown;
