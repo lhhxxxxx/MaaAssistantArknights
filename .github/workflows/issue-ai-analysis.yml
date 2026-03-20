@@ -44,6 +44,8 @@ jobs:
             感谢您的反馈！AI 正在自动分析该问题，预计耗时约 10 分钟。
           prompt-template: |
             分析 GitHub Issue {{issue_number}}。把最终结论写到 {{copilot_answer_file}}。
+          extra-comment-content: |
+            <!-- Skip all labels -->
 
       - name: Consume outputs
         env:
