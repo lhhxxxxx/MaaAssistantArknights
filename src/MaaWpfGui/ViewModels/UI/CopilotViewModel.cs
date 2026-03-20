@@ -83,6 +83,9 @@ public partial class CopilotViewModel : Screen
     [GeneratedRegex(@"^act\d+(side|mini)_")]
     private static partial Regex SideStoryStageIdRegex();
 
+    [GeneratedRegex(@"^(main|sub|tough|hard)_")]
+    private static partial Regex MainStageIdRegex();
+
     /// <summary>
     /// Gets the view models of log items.
     /// </summary>
@@ -1198,9 +1201,9 @@ public partial class CopilotViewModel : Screen
 
         if (mapInfo?.StageId is { } stageId)
         {
-            if (stageId.StartsWith("mem_"))
+            if (GetCopilotType(stageId) is CopilotType type and not CopilotType.Unknown)
             {
-                CopilotTabIndex = 2;
+                CopilotTabIndex = (int)type;
             }
         }
 
@@ -2238,7 +2241,7 @@ public partial class CopilotViewModel : Screen
         Keyboard.ClearFocus();
     }
 
-    private async Task<CopilotType> GetCopilotTypeAsync(string filePath)
+    private static async Task<CopilotType> GetCopilotTypeAsync(string filePath)
     {
         try
         {
@@ -2258,7 +2261,7 @@ public partial class CopilotViewModel : Screen
         }
     }
 
-    private CopilotType GetCopilotType(CopilotBase? @base)
+    private static CopilotType GetCopilotType(CopilotBase? @base)
     {
         if (@base is null)
         {
@@ -2279,20 +2282,30 @@ public partial class CopilotViewModel : Screen
             {
                 return CopilotType.Unknown;
             }
-            if (mapInfo.StageId?.StartsWith("mem_") is true)
-            {
-                return CopilotType.Paradox;
-            }
-            else if (mapInfo.StageId?.StartsWith("main_") is true || SideStoryStageIdRegex().IsMatch(mapInfo.StageId ?? string.Empty))
-            {
-                return CopilotType.MainStageAndSideStory;
-            }
-            else if (SideStoryStageIdRegex().IsMatch(mapInfo.StageId ?? string.Empty))
-            {
-                return CopilotType.MainStageAndSideStory;
-            }
+            return GetCopilotType(mapInfo.StageId);
         }
 
+        return CopilotType.Unknown;
+    }
+
+    private static CopilotType GetCopilotType(string? stageId)
+    {
+        if (stageId?.StartsWith("mem_") is true)
+        {
+            return CopilotType.Paradox;
+        }
+        else if (stageId?.StartsWith("lt_") is true)
+        {
+            return CopilotType.SSS;
+        }
+        else if (!string.IsNullOrEmpty(stageId) && MainStageIdRegex().IsMatch(stageId))
+        {
+            return CopilotType.MainStageAndSideStory;
+        }
+        else if (!string.IsNullOrEmpty(stageId) && SideStoryStageIdRegex().IsMatch(stageId))
+        {
+            return CopilotType.MainStageAndSideStory;
+        }
         return CopilotType.Unknown;
     }
 
