@@ -1852,7 +1852,6 @@ public partial class CopilotViewModel : Screen
         if (types.Contains(CopilotType.Unknown))
         {
             AddLog(LocalizationHelper.GetString("CopilotTaskTypeParseFailedSkipCheck"), UiLogColor.Error, showTime: false);
-            return false;
         }
         else if (types.Count > 1)
         {
