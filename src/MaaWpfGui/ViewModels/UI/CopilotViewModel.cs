@@ -44,6 +44,7 @@ using Stylet;
 using static MaaWpfGui.Helper.CopilotHelper;
 using static MaaWpfGui.Helper.PathsHelper;
 using static MaaWpfGui.Models.AsstTasks.AsstCopilotTask;
+using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
 using DataFormats = System.Windows.Forms.DataFormats;
 using Task = System.Threading.Tasks.Task;
 
@@ -1177,10 +1178,10 @@ public partial class CopilotViewModel : Screen
         }
         if (printInfo)
         {
-        foreach (var (output, color) in copilot.Output())
-        {
-            AddLog(output, color ?? UiLogColor.Message, showTime: false); // 作业信息输出
-        }
+            foreach (var (output, color) in copilot.Output())
+            {
+                AddLog(output, color ?? UiLogColor.Message, showTime: false); // 作业信息输出
+            }
         }
 
         MapUrl = MapUiUrl.Replace("areas", "map/" + copilot.StageName);
@@ -1287,7 +1288,10 @@ public partial class CopilotViewModel : Screen
             }
         }
 
-        await AddSSSCopilotTaskToList(copilot, CopilotId);
+        if (UseCopilotList)
+        {
+            await AddSSSCopilotTaskToList(copilot, CopilotId);
+        }
 
         return true;
     }
@@ -1345,16 +1349,10 @@ public partial class CopilotViewModel : Screen
             return;
         }
 
-        var tasks = await Task.WhenAll(copilotSet.CopilotIds.Select(async (copilotId) => await GetCopilotAsync(copilotId)));
-        var targetType = tasks.Select(task => GetCopilotType(task.Payload)).FirstOrDefault(type => type != CopilotType.Unknown);
-        if (targetType != CopilotType.Unknown)
+        var list = copilotSet.CopilotIds.Select(async (copilotId) => await GetCopilotAsync(copilotId)).ToList();
+        foreach (var task in list)
         {
-            CopilotTabIndex = (int)targetType;
-            UseCopilotList = targetType is CopilotType.MainStageAndSideStory or CopilotType.Paradox;
-        }
-
-        foreach (var (copilotId, payload) in tasks)
-        {
+            var (copilotId, payload) = await task;
             if (payload is CopilotModel copilot)
             {
                 if (!await ParseCopilotAsync(copilot, true, true, copilotId, false))
@@ -1362,9 +1360,13 @@ public partial class CopilotViewModel : Screen
                     AddLog(LocalizationHelper.GetString("CopilotJsonError") + $", copilotId: {copilotId}", UiLogColor.Error, showTime: false);
                     continue;
                 }
+                var opers = JArray.FromObject(copilot.Opers.Select(i => i.Name));
+                opers = JArray.FromObject(opers.Union(JArray.FromObject(copilot.Groups.Select(i => i.Opers.Select(op => op.Name)))));
+                AddLog(opers.ToString(Formatting.None), UiLogColor.Message, showTime: false);
             }
             else if (payload is SSSCopilotModel sss)
             {
+                CopilotTabIndex = 1;
                 await AddSSSCopilotTaskToList(sss, copilotId);
             }
         }
