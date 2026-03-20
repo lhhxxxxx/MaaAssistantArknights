@@ -80,7 +80,7 @@ public partial class CopilotViewModel : Screen
     [GeneratedRegex(InvalidStageNameChars)]
     private static partial Regex InvalidStageNameRegex();
 
-    [GeneratedRegex(@"^act\d+(side|mini)_")]
+    [GeneratedRegex(@"^(act\d+(side|mini)|a00\d+)_")]
     private static partial Regex SideStoryStageIdRegex();
 
     [GeneratedRegex(@"^(main|sub|tough|hard)_")]
@@ -835,13 +835,7 @@ public partial class CopilotViewModel : Screen
     [UsedImplicitly]
     public async Task PasteClipboardCopilotSet()
     {
-        if (CopilotTabIndex is 1)
-        {
-            return;
-        }
-
         StartEnabled = false;
-        UseCopilotList = true;
         ClearLog();
         if (Clipboard.ContainsText())
         {
@@ -896,9 +890,9 @@ public partial class CopilotViewModel : Screen
 
                     await AddCopilotTaskToList(copilot, difficulty);
                 }
-                else if (payload is SSSCopilotModel)
+                else if (payload is SSSCopilotModel sss)
                 {
-                    AddLog(LocalizationHelper.GetString("CopilotSSSNotSupport"), UiLogColor.Error, showTime: false);
+                    await AddSSSCopilotTaskToList(sss);
                 }
             }
             catch
@@ -1293,6 +1287,8 @@ public partial class CopilotViewModel : Screen
             }
         }
 
+        await AddSSSCopilotTaskToList(copilot, CopilotId);
+
         return true;
     }
 
@@ -1349,10 +1345,16 @@ public partial class CopilotViewModel : Screen
             return;
         }
 
-        var list = copilotSet.CopilotIds.Select(async (copilotId) => await GetCopilotAsync(copilotId)).ToList();
-        foreach (var task in list)
+        var tasks = await Task.WhenAll(copilotSet.CopilotIds.Select(async (copilotId) => await GetCopilotAsync(copilotId)));
+        var targetType = tasks.Select(task => GetCopilotType(task.Payload)).FirstOrDefault(type => type != CopilotType.Unknown);
+        if (targetType != CopilotType.Unknown)
         {
-            var (copilotId, payload) = await task;
+            CopilotTabIndex = (int)targetType;
+            UseCopilotList = targetType is CopilotType.MainStageAndSideStory or CopilotType.Paradox;
+        }
+
+        foreach (var (copilotId, payload) in tasks)
+        {
             if (payload is CopilotModel copilot)
             {
                 if (!await ParseCopilotAsync(copilot, true, true, copilotId, false))
@@ -1360,6 +1362,10 @@ public partial class CopilotViewModel : Screen
                     AddLog(LocalizationHelper.GetString("CopilotJsonError") + $", copilotId: {copilotId}", UiLogColor.Error, showTime: false);
                     continue;
                 }
+            }
+            else if (payload is SSSCopilotModel sss)
+            {
+                await AddSSSCopilotTaskToList(sss, copilotId);
             }
         }
 
@@ -1586,7 +1592,7 @@ public partial class CopilotViewModel : Screen
             }
             else if (_copilotCache is SSSCopilotModel { } sss)
             {
-                AddLog(LocalizationHelper.GetString("CopilotSSSNotSupport"), UiLogColor.Error, showTime: false);
+                await AddSSSCopilotTaskToList(sss, CopilotId);
             }
         }
         catch (Exception ex)
@@ -1699,6 +1705,64 @@ public partial class CopilotViewModel : Screen
                 CopilotItemViewModels.Add(item);
             }
         }
+
+        _semaphore.Release();
+        SaveCopilotTask();
+        return true;
+    }
+
+    private async Task<bool> AddSSSCopilotTaskToList(SSSCopilotModel copilot, int copilotId = 0)
+    {
+        if (string.IsNullOrEmpty(copilot.StageName) || copilot.Type != new SSSCopilotModel().Type)
+        {
+            _logger.Error("Could not add SSS copilot task with empty stage");
+            return false;
+        }
+
+        if (!Path.Exists(CopilotJsonDir))
+        {
+            try
+            {
+                Directory.CreateDirectory(CopilotJsonDir);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        var fileName = string.Concat(copilot.StageName.Split(Path.GetInvalidFileNameChars())).Trim();
+        if (string.IsNullOrWhiteSpace(fileName))
+        {
+            fileName = DateTimeOffset.Now.ToUnixTimeSeconds().ToString();
+        }
+
+        var cachePath = Path.GetRelativePath(BaseDir, $"{CopilotJsonDir}/{fileName}.json");
+        await _semaphore.WaitAsync();
+        if (File.Exists(cachePath) && CopilotItemViewModels.Any(i => i.FilePath == cachePath))
+        {
+            cachePath = Path.GetRelativePath(BaseDir, $"{CopilotJsonDir}/{fileName}_{DateTimeOffset.Now.ToUnixTimeMilliseconds()}.json");
+            if (CopilotItemViewModels.Any(i => i.FilePath == cachePath))
+            {
+                _logger.Error("Could not add SSS copilot task with duplicate stage name: {StageName}", copilot.StageName);
+                _semaphore.Release();
+                return false;
+            }
+        }
+
+        try
+        {
+            await File.WriteAllTextAsync(cachePath, JsonConvert.SerializeObject(copilot, Formatting.Indented));
+        }
+        catch
+        {
+            AddLog(LocalizationHelper.GetString("CopilotCouldNotSaveFile") + cachePath, UiLogColor.Error, showTime: false);
+            _semaphore.Release();
+            return false;
+        }
+
+        var item = new CopilotItemViewModel(copilot.StageName, cachePath, false, copilotId) { Index = CopilotItemViewModels.Count, };
+        CopilotItemViewModels.Add(item);
 
         _semaphore.Release();
         SaveCopilotTask();
@@ -1855,15 +1919,20 @@ public partial class CopilotViewModel : Screen
             return false;
         }
 
-        var types = new HashSet<CopilotType>(await Task.WhenAll(selected.Select(item => GetCopilotTypeAsync(item.FilePath))));
-        if (types.Contains(CopilotType.Unknown))
+        if (tabIndex != 3)
         {
-            AddLog(LocalizationHelper.GetString("CopilotTaskTypeParseFailedSkipCheck"), UiLogColor.Error, showTime: false);
-        }
-        else if (types.Count > 1)
-        {
-            AddLog(LocalizationHelper.GetString("CopilotTaskListMixedModeNotAllowed") + "\n" + string.Join(", ", types.Select(i => GetCopilotTabName(i))), UiLogColor.Error, showTime: false);
-            return false;
+            var types = new HashSet<CopilotType>(await Task.WhenAll(selected.Select(item => GetCopilotTypeAsync(item.FilePath))));
+            var concreteTypes = types.Where(type => type != CopilotType.Unknown).ToArray();
+            if (types.Contains(CopilotType.Unknown))
+            {
+                AddLog(LocalizationHelper.GetString("CopilotTaskTypeParseFailedSkipCheck"), UiLogColor.Error, showTime: false);
+            }
+
+            if (concreteTypes.Length > 1)
+            {
+                AddLog(LocalizationHelper.GetString("CopilotTaskListMixedModeNotAllowed") + "\n" + string.Join(", ", concreteTypes.Select(GetCopilotTabName)), UiLogColor.Error, showTime: false);
+                return false;
+            }
         }
 
         // 先判断 CopilotTabIndex，再判断对应选项
@@ -2187,7 +2256,7 @@ public partial class CopilotViewModel : Screen
         {
             if (!DataHelper.Operators.Any(op => op.Value.Name == DataHelper.GetLocalizedCharacterName(task.Name, "zh-cn")))
             {
-                AddLog("illegal oper name: " + task.Name, UiLogColor.Error, showTime: false);
+                AddLog(string.Format(LocalizationHelper.GetString("CopilotIllegalOperName"), task.Name), UiLogColor.Error, showTime: false);
                 _ = Task.Run(ResourceUpdater.ResourceUpdateAndReloadAsync);
                 AchievementTrackerHelper.Instance.Unlock(AchievementIds.MapOutdated);
                 ok = false;
@@ -2304,14 +2373,18 @@ public partial class CopilotViewModel : Screen
         {
             return CopilotType.SSS;
         }
-        else if (!string.IsNullOrEmpty(stageId) && MainStageIdRegex().IsMatch(stageId))
+        else if (!string.IsNullOrEmpty(stageId))
         {
-            return CopilotType.MainStageAndSideStory;
+            if (MainStageIdRegex().IsMatch(stageId))
+            {
+                return CopilotType.MainStageAndSideStory;
+            }
+            if (SideStoryStageIdRegex().IsMatch(stageId))
+            {
+                return CopilotType.MainStageAndSideStory;
+            }
         }
-        else if (!string.IsNullOrEmpty(stageId) && SideStoryStageIdRegex().IsMatch(stageId))
-        {
-            return CopilotType.MainStageAndSideStory;
-        }
+
         return CopilotType.Unknown;
     }
 

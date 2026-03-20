@@ -1063,6 +1063,7 @@ Right-click to clear inactive jobs</system:String>
     <system:String x:Key="CopilotSingleTaskWarning">You're using ｢{key=UseCopilotList}｣ to execute a single task, which is not recommended. For single tasks, please run them directly instead.</system:String>
     <system:String x:Key="CopilotTaskListMixedModeNotAllowed">Currently using ｢{key=UseCopilotList}｣. Mixing different job types is not supported.</system:String>
     <system:String x:Key="CopilotTaskTypeParseFailedSkipCheck">Failed to parse some job types. Skipping type checks.</system:String>
+    <system:String x:Key="CopilotIllegalOperName">Illegal operator name: {0}</system:String>
     <!--  !Logs  -->
     <!--  !Copilot  -->
     <!--  ErrorView  -->
