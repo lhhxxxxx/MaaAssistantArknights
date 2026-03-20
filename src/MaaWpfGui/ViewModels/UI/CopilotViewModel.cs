@@ -83,9 +83,6 @@ public partial class CopilotViewModel : Screen
     [GeneratedRegex(@"^act\d+(side|mini)_")]
     private static partial Regex SideStoryStageIdRegex();
 
-    [GeneratedRegex(@"^(main|sub|tough)_")]
-    private static partial Regex MainStageIdRegex();
-
     /// <summary>
     /// Gets the view models of log items.
     /// </summary>
@@ -886,8 +883,6 @@ public partial class CopilotViewModel : Screen
                 using var reader = new StreamReader(File.OpenRead(file));
                 var str = await reader.ReadToEndAsync();
                 var payload = JsonConvert.DeserializeObject<CopilotBase>(str, new CopilotContentConverter());
-                TrySwitchCopilotTabForImport(payload);
-
                 if (payload is CopilotModel copilot)
                 {
                     var difficulty = copilot.Difficulty;
@@ -1063,11 +1058,9 @@ public partial class CopilotViewModel : Screen
         switch (payload)
         {
             case CopilotModel copilot:
-                TrySwitchCopilotTabForImport(copilot);
                 await ParseCopilotAsync(copilot, writeToCache, UseCopilotList, copilotId);
                 return;
             case SSSCopilotModel sss:
-                TrySwitchCopilotTabForImport(sss);
                 await ParseSSSCopilot(sss, writeToCache);
                 return;
             default:
@@ -1351,27 +1344,13 @@ public partial class CopilotViewModel : Screen
         }
 
         var list = copilotSet.CopilotIds.Select(async (copilotId) => await GetCopilotAsync(copilotId)).ToList();
-        var shouldDetermineTabByFirstTask = true;
-        CopilotType firstFileType = CopilotType.Unknown;
         foreach (var task in list)
         {
             var (copilotId, payload) = await task;
-            if (shouldDetermineTabByFirstTask)
-            {
-                firstFileType = TrySwitchCopilotTabForImport(payload);
-                TrySwitchCopilotTabForImport(payload);
-                shouldDetermineTabByFirstTask = false;
-            }
-
             if (payload is CopilotModel copilot)
             {
                 await ParseCopilotAsync(copilot, true, true, copilotId);
             }
-        }
-
-        if (firstFileType == CopilotType.Unknown)
-        {
-            AddLog(LocalizationHelper.GetString("CopilotTaskTypeParseFailedKeepCurrentTab"), UiLogColor.Warning, showTime: false);
         }
 
         Log(copilotSet.Name, copilotSet.Description);
@@ -1693,20 +1672,20 @@ public partial class CopilotViewModel : Screen
 
             name ??= stageCode;
 
-            var item = new CopilotItemViewModel(name, cachePath, false, copilotId) { Index = CopilotItemViewModels.Count, TabIndex = CopilotTabIndex, };
+            var item = new CopilotItemViewModel(name, cachePath, false, copilotId) { Index = CopilotItemViewModels.Count, };
             CopilotItemViewModels.Add(item);
         }
         else
         {
             if (flags.HasFlag(CopilotModel.DifficultyFlags.Normal))
             {
-                var item = new CopilotItemViewModel(stageCode, cachePath, false, copilotId) { Index = CopilotItemViewModels.Count, TabIndex = CopilotTabIndex, };
+                var item = new CopilotItemViewModel(stageCode, cachePath, false, copilotId) { Index = CopilotItemViewModels.Count, };
                 CopilotItemViewModels.Add(item);
             }
 
             if (flags.HasFlag(CopilotModel.DifficultyFlags.Raid))
             {
-                var item = new CopilotItemViewModel(stageCode, cachePath, true, copilotId) { Index = CopilotItemViewModels.Count, TabIndex = CopilotTabIndex, };
+                var item = new CopilotItemViewModel(stageCode, cachePath, true, copilotId) { Index = CopilotItemViewModels.Count, };
                 CopilotItemViewModels.Add(item);
             }
         }
@@ -1859,32 +1838,26 @@ public partial class CopilotViewModel : Screen
     {
         var selected = CopilotItemViewModels.Where(i => i.IsChecked).ToArray();
 
+        // 空列表：提示并失败
         if (selected.Length == 0)
         {
             AddLog(LocalizationHelper.GetString("CopilotStartWithEmptyList"), UiLogColor.Error, showTime: false);
             return false;
         }
 
-        if (selected.Any(i => i.TabIndex is null))
+        var types = new HashSet<CopilotType>(await Task.WhenAll(selected.Select(item => GetCopilotTypeAsync(item.FilePath))));
+        if (types.Contains(CopilotType.Unknown))
         {
-            AddLog(LocalizationHelper.GetString("CopilotTaskListLegacyItemNotSupported"), UiLogColor.Error, showTime: false);
+            AddLog(LocalizationHelper.GetString("CopilotTaskTypeParseFailedSkipCheck"), UiLogColor.Error, showTime: false);
+            return false;
+        }
+        else if (types.Count > 1)
+        {
+            AddLog(LocalizationHelper.GetString("CopilotTaskListMixedModeNotAllowed") + "\n" + string.Join(", ", types.Select(i => GetCopilotTabName(i))), UiLogColor.Error, showTime: false);
             return false;
         }
 
-        var tabs = selected.Select(i => i.TabIndex!.Value).Distinct().ToArray();
-        if (tabs.Length > 1)
-        {
-            AddLog(LocalizationHelper.GetStringFormat("CopilotTaskListMixedModeNotAllowed", string.Join(", ", tabs.Select(GetCopilotTabName))), UiLogColor.Error, showTime: false);
-            return false;
-        }
-
-        var listTab = tabs[0];
-        if (listTab != tabIndex)
-        {
-            AddLog(LocalizationHelper.GetStringFormat("CopilotTaskListTabMismatch", GetCopilotTabName(tabIndex), GetCopilotTabName(listTab)), UiLogColor.Error, showTime: false);
-            return false;
-        }
-
+        // 先判断 CopilotTabIndex，再判断对应选项
         if (tabIndex == 2)
         {
             return VerifyParadoxTasks(selected);
@@ -2215,41 +2188,6 @@ public partial class CopilotViewModel : Screen
         return ok;
     }
 
-    private CopilotType TrySwitchCopilotTabForImport(CopilotBase? payload)
-    {
-        if (CopilotTabIndex == 3)
-        {
-            return CopilotType.Other;
-        }
-
-        var tabIndex = GetCopilotTabIndex(GetCopilotType(payload));
-        if (tabIndex is int value)
-        {
-            CopilotTabIndex = value;
-            return (CopilotType)value;
-        }
-
-        return CopilotType.Unknown;
-    }
-
-    private static int? GetCopilotTabIndex(CopilotType type) =>
-        type switch {
-            CopilotType.MainStageAndSideStory => 0,
-            CopilotType.SSS => 1,
-            CopilotType.Paradox => 2,
-            CopilotType.Other => 3,
-            _ => null,
-        };
-
-    private static string GetCopilotTabName(int tabIndex) =>
-        GetCopilotTabName(tabIndex switch {
-            0 => CopilotType.MainStageAndSideStory,
-            1 => CopilotType.SSS,
-            2 => CopilotType.Paradox,
-            3 => CopilotType.Other,
-            _ => CopilotType.Unknown,
-        });
-
     private static string GetCopilotTabName(CopilotType type) =>
          type switch {
              CopilotType.MainStageAndSideStory => LocalizationHelper.GetString("MainStageStoryCollectionSideStory"),
@@ -2345,7 +2283,7 @@ public partial class CopilotViewModel : Screen
             {
                 return CopilotType.Paradox;
             }
-            else if (MainStageIdRegex().IsMatch(mapInfo.StageId ?? string.Empty) || SideStoryStageIdRegex().IsMatch(mapInfo.StageId ?? string.Empty))
+            else if (mapInfo.StageId?.StartsWith("main_") is true || SideStoryStageIdRegex().IsMatch(mapInfo.StageId ?? string.Empty))
             {
                 return CopilotType.MainStageAndSideStory;
             }
