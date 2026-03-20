@@ -42,7 +42,7 @@ jobs:
 
       - name: Build and send Discord message
         env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL_TEST }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
           TAG="${{ steps.release.outputs.tag }}"
           URL="${{ steps.release.outputs.url }}"
