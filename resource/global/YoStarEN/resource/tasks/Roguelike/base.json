@@ -63,9 +63,9 @@
             ["Tourist Squad", "游客分队"],
             ["Sui Regulator Squad", "司岁台分队"],
             ["Tianshi Bureau Squad", "天师府分队"],
-            ["Cluster of Blooms Squad__DLC__", "花团锦簇分队"],
-            ["Daring Gambit Squad__DLC__", "棋行险着分队"],
-            ["Echoes of Time Squad__DLC__", "岁影回音分队"]
+            ["Blooming Flowers Squad", "花团锦簇分队"],
+            ["Perilous Game Squad", "棋行险着分队"],
+            ["Sui's Shadow Squad", "岁影回音分队"]
         ]
     },
     "RoguelikeFormationOcr": {
