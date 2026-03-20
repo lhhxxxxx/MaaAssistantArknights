@@ -210,7 +210,7 @@
                                     <Setter Property="MinHeight" Value="24.5" />
                                     <Setter Property="Height" Value="Auto" />
                                     <Style.Triggers>
-                                        <DataTrigger Binding="{c:Binding 'Items.Count > 10', RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" Value="True">
+                                        <DataTrigger Binding="{c:Binding 'Items.Count > 9', RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" Value="True">
                                             <Setter Property="MaxHeight" Value="{c:Binding 'ActualHeight / (Items.Count + 1.5) less 24.5 ? 24.5 : ActualHeight / (Items.Count + 1.5)', RelativeSource={RelativeSource AncestorType={x:Type ListBox}}}" />
                                         </DataTrigger>
                                     </Style.Triggers>
