@@ -42,7 +42,7 @@ jobs:
 
       - name: Build and send Discord message
         env:
-          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL_TEST }}
         run: |
           TAG="${{ steps.release.outputs.tag }}"
           URL="${{ steps.release.outputs.url }}"
@@ -52,10 +52,28 @@ jobs:
           MAC_URL="${BASE_URL}/MAA-${TAG}-macos-universal.dmg"
           LIN_URL="${BASE_URL}/MAA-${TAG}-linux-amd64.tar.gz"
 
-          CONTENT=$(printf '🎉 **New MAA Release:  %s**\n\nRead the full release note [here](%s).\n\nOpen or reopen your MAA client to get automatic updates.\nOr, download `MAA %s` for your platform:\n[Windows (x64) ↗](%s)  |  [macOS (Universal, dmg) ↗](%s)  |  [Linux (amd64, tar.gz) ↗](%s)' \
-            "$TAG" "$URL" "$TAG" "$WIN_URL" "$MAC_URL" "$LIN_URL")
+          DESCRIPTION=$(printf 'Read the full release note [here](%s).\n\nOpen or reopen your MAA client to get automatic updates.\nOr, download `MAA %s` for your platform by clicking the buttons below.' "$URL" "$TAG")
 
-          PAYLOAD=$(jq -n --arg content "$CONTENT" '{ content: $content }')
+          PAYLOAD=$(jq -n \
+            --arg tag "$TAG" \
+            --arg url "$URL" \
+            --arg description "$DESCRIPTION" \
+            --arg win_url "$WIN_URL" \
+            --arg mac_url "$MAC_URL" \
+            --arg lin_url "$LIN_URL" \
+            '{
+              embeds: [{
+                title: ("🎉 New MAA Release:  " + $tag),
+                url: $url,
+                description: $description,
+                color: 5793266,
+                fields: [
+                  { name: "Windows (x64)", value: ("[↗ Download](" + $win_url + ")"), inline: true },
+                  { name: "macOS (Universal, dmg)", value: ("[↗ Download](" + $mac_url + ")"), inline: true },
+                  { name: "Linux (amd64, tar.gz)", value: ("[↗ Download](" + $lin_url + ")"), inline: true }
+                ]
+              }]
+            }')
 
           HTTP_STATUS=$(curl -sS -o /tmp/discord_response.txt -w "%{http_code}" \
             -X POST "$DISCORD_WEBHOOK_URL" \
