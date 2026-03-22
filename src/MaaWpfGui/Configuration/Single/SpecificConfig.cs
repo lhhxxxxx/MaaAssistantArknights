@@ -57,5 +57,6 @@ public class SpecificConfig : INotifyPropertyChanged, IJsonOnDeserialized
         TaskQueue.Add(new AwardTask());
         TaskQueue.Add(new RoguelikeTask());
         TaskQueue.Add(new ReclamationTask());
+        TaskQueue.Add(new UserDataUpdateTask());
     }
 }
