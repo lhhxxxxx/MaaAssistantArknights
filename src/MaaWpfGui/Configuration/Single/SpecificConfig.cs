@@ -16,7 +16,6 @@ using System.Text.Json.Serialization;
 using JetBrains.Annotations;
 using MaaWpfGui.Configuration.Factory;
 using MaaWpfGui.Configuration.Single.MaaTask;
-using MaaWpfGui.Helper;
 using ObservableCollections;
 
 namespace MaaWpfGui.Configuration.Single;
@@ -55,15 +54,15 @@ public class SpecificConfig : INotifyPropertyChanged, IJsonOnDeserialized
             return;
         }
 
-        TaskQueue.Add(new StartUpTask { Name = LocalizationHelper.GetString("StartUp") });
-        TaskQueue.Add(new FightTask { Name = LocalizationHelper.GetString("Fight") });
-        TaskQueue.Add(new InfrastTask { Name = LocalizationHelper.GetString("Infrast") });
-        TaskQueue.Add(new RecruitTask { Name = LocalizationHelper.GetString("Recruit") });
-        TaskQueue.Add(new MallTask { Name = LocalizationHelper.GetString("Mall") });
-        TaskQueue.Add(new AwardTask { Name = LocalizationHelper.GetString("Award") });
-        TaskQueue.Add(new RoguelikeTask { Name = LocalizationHelper.GetString("Roguelike") });
-        TaskQueue.Add(new ReclamationTask { Name = LocalizationHelper.GetString("Reclamation") });
-        TaskQueue.Add(new UserDataUpdateTask { Name = LocalizationHelper.GetString("UserDataUpdate") });
+        TaskQueue.Add(new StartUpTask());
+        TaskQueue.Add(new FightTask());
+        TaskQueue.Add(new InfrastTask());
+        TaskQueue.Add(new RecruitTask());
+        TaskQueue.Add(new MallTask());
+        TaskQueue.Add(new AwardTask());
+        TaskQueue.Add(new RoguelikeTask());
+        TaskQueue.Add(new ReclamationTask());
+        TaskQueue.Add(new UserDataUpdateTask());
     }
 
     public void OnDeserialized()
