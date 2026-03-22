@@ -481,12 +481,12 @@ public class ConfigConverter
                     switch (task.OldName)
                     {
                         case "WakeUp":
-                            startUpTask.Name = LocalizationHelper.GetString(task.OldName, local);
+                            // startUpTask.Name = LocalizationHelper.GetString(task.OldName, local);
                             startUpTask.IsEnable = task.IsEnable;
                             ConfigFactory.CurrentConfig.TaskQueue.Add(startUpTask);
                             break;
                         case "Combat":
-                            fightTask.Name = LocalizationHelper.GetString(task.OldName, local);
+                            // fightTask.Name = LocalizationHelper.GetString(task.OldName, local);
                             fightTask2.Name = LocalizationHelper.GetString("RemainingSanityStage", local);
                             fightTask.IsEnable = task.IsEnable;
                             fightTask2.IsEnable = task.IsEnable && ConfigurationHelper.GetValue(ConfigurationKeys.UseRemainingSanityStage, true) && fightTask2.StagePlan.FirstOrDefault() != string.Empty;
@@ -500,32 +500,32 @@ public class ConfigConverter
                             ConfigurationHelper.DeleteValue(ConfigurationKeys.UseRemainingSanityStage);
                             break;
                         case "Mission":
-                            awardTask.Name = LocalizationHelper.GetString(task.OldName, local);
+                            // awardTask.Name = LocalizationHelper.GetString(task.OldName, local);
                             awardTask.IsEnable = task.IsEnable;
                             ConfigFactory.CurrentConfig.TaskQueue.Add(awardTask);
                             break;
                         case "Mall":
-                            mallTask.Name = LocalizationHelper.GetString(task.OldName, local);
+                            // mallTask.Name = LocalizationHelper.GetString(task.OldName, local);
                             mallTask.IsEnable = task.IsEnable;
                             ConfigFactory.CurrentConfig.TaskQueue.Add(mallTask);
                             break;
                         case "Base":
-                            infrastTask.Name = LocalizationHelper.GetString(task.OldName, local);
+                            // infrastTask.Name = LocalizationHelper.GetString(task.OldName, local);
                             infrastTask.IsEnable = task.IsEnable;
                             ConfigFactory.CurrentConfig.TaskQueue.Add(infrastTask);
                             break;
                         case "Recruiting":
-                            recruitTask.Name = LocalizationHelper.GetString(task.OldName, local);
+                            // recruitTask.Name = LocalizationHelper.GetString(task.OldName, local);
                             recruitTask.IsEnable = task.IsEnable;
                             ConfigFactory.CurrentConfig.TaskQueue.Add(recruitTask);
                             break;
                         case "AutoRoguelike":
-                            roguelikeTask.Name = LocalizationHelper.GetString(task.OldName, local);
+                            // roguelikeTask.Name = LocalizationHelper.GetString(task.OldName, local);
                             roguelikeTask.IsEnable = task.IsEnable;
                             ConfigFactory.CurrentConfig.TaskQueue.Add(roguelikeTask);
                             break;
                         case "Reclamation":
-                            reclamationTask.Name = LocalizationHelper.GetString(task.OldName, local);
+                            // reclamationTask.Name = LocalizationHelper.GetString(task.OldName, local);
                             reclamationTask.IsEnable = task.IsEnable;
                             ConfigFactory.CurrentConfig.TaskQueue.Add(reclamationTask);
                             break;
