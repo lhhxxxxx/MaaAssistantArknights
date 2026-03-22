@@ -619,7 +619,12 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
     public bool UseWeeklySchedule
     {
         get => GetTaskConfig<FightTask>().UseWeeklySchedule;
-        set => SetTaskConfig<FightTask>(t => t.UseWeeklySchedule == value, t => t.UseWeeklySchedule = value);
+        set {
+            if (SetTaskConfig<FightTask>(t => t.UseWeeklySchedule == value, t => t.UseWeeklySchedule = value) && value)
+            {
+                HideUnavailableStage = false;
+            }
+        }
     }
 
     public ObservableCollection<WeeklyScheduleItem> WeeklyScheduleSource { get; set; } = new(Enum.GetValues<DayOfWeek>().Select(i => new WeeklyScheduleItem(i)));
