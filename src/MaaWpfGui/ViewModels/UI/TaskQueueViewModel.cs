@@ -1755,8 +1755,7 @@ public class TaskQueueViewModel : Screen
                 {
                     case true:
                         ++count;
-                        Instances.TaskQueueViewModel.TaskItemViewModels[index].SetTaskIds(taskIds);
-                        // Instances.TaskQueueViewModel.TaskItemViewModels.ElementAtOrDefault(index)?.TaskId = taskId;
+                        Instances.TaskQueueViewModel.TaskItemViewModels.ElementAtOrDefault(index)?.SetTaskIds(taskIds);
                         break;
                     case false:
                         taskRet = false;
