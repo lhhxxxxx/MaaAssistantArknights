@@ -966,7 +966,7 @@ public class TaskQueueViewModel : Screen
             var task = ConfigFactory.CurrentConfig.TaskQueue.ElementAt(i);
             if (task is not null)
             {
-                taskqueue.Add(new TaskItemViewModel(GetTaskDisplayName(task), task.IsEnable) { Index = i });
+                taskqueue.Add(new TaskItemViewModel(task.NameDisplay, task.IsEnable) { Index = i });
             }
         }
 
@@ -1287,29 +1287,6 @@ public class TaskQueueViewModel : Screen
             new GenericCombinedData<Type> { Display = LocalizationHelper.GetString("Custom"), Value = typeof(CustomTask) },
         ]);
 
-    public void AddTaskQueueTask(Type taskName)
-    {
-        if (Activator.CreateInstance(taskName) is BaseTask task)
-        {
-            ConfigFactory.CurrentConfig.TaskQueue.Add(task);
-            TaskItemViewModels.Add(new TaskItemViewModel(GetTaskDisplayName(task)));
-        }
-        else
-        {
-            AddLog("could NOT create instance of " + taskName, UiLogColor.Error);
-        }
-    }
-
-    private static string GetTaskDisplayName(BaseTask task)
-    {
-        if (!string.IsNullOrWhiteSpace(task.Name))
-        {
-            return task.Name;
-        }
-
-        return LocalizationHelper.GetString(task.TaskType.ToString());
-    }
-
     /// <summary>
     /// 重命名任务
     /// </summary>
@@ -1336,13 +1313,16 @@ public class TaskQueueViewModel : Screen
         if (result == true && !string.IsNullOrWhiteSpace(dialog.InputText))
         {
             var newName = dialog.InputText.Trim().Replace("\r", string.Empty).Replace("\n", string.Empty);
-            taskItem.Name = newName;
             if (taskItem.Index < ConfigFactory.CurrentConfig.TaskQueue.Count)
             {
                 ConfigFactory.CurrentConfig.TaskQueue[taskItem.Index].Name = newName;
+                taskItem.Name = ConfigFactory.CurrentConfig.TaskQueue[taskItem.Index].NameDisplay;
+                AddLog(LocalizationHelper.GetStringFormat("TaskRenamed", newName), UiLogColor.Info);
             }
-
-            AddLog(string.Format(LocalizationHelper.GetString("TaskRenamed"), newName), UiLogColor.Info);
+            else
+            {
+                AddLog("Rename failed", UiLogColor.Error);
+            }
         }
     }
 
@@ -1746,11 +1726,10 @@ public class TaskQueueViewModel : Screen
         foreach (var item in tasks)
         {
             var index = ConfigFactory.CurrentConfig.TaskQueue.IndexOf(item);
-            var taskDisplayName = GetTaskDisplayName(item);
             _logger.Information("Index {Index}, Type {TaskType}, Name {TaskName}, IsEnable {IsEnable}",
                 index,
                 item.TaskType,
-                taskDisplayName,
+                item.NameDisplay,
                 item.IsEnable);
             if (!IsTaskEnable(item))
             {
@@ -1769,11 +1748,11 @@ public class TaskQueueViewModel : Screen
                         break;
                     case false:
                         taskRet = false;
-                        AddLog(LocalizationHelper.GetStringFormat("TaskAppend.Error", LocalizationHelper.GetString(item.TaskType.ToString()), taskDisplayName), UiLogColor.Error);
+                        AddLog(LocalizationHelper.GetStringFormat("TaskAppend.Error", LocalizationHelper.GetString(item.TaskType.ToString()), item.NameDisplay), UiLogColor.Error);
                         SetTaskStatus(index, TaskItemStatus.Error);
                         break;
                     case null:
-                        AddLog(LocalizationHelper.GetStringFormat("TaskAppend.Skip", LocalizationHelper.GetString(item.TaskType.ToString()), taskDisplayName), UiLogColor.Info);
+                        AddLog(LocalizationHelper.GetStringFormat("TaskAppend.Skip", LocalizationHelper.GetString(item.TaskType.ToString()), item.NameDisplay), UiLogColor.Info);
                         SetTaskStatus(index, TaskItemStatus.Skipped);
                         break;
                 }
@@ -1781,7 +1760,7 @@ public class TaskQueueViewModel : Screen
             catch (Exception ex)
             {
                 taskRet = false;
-                AddLog(LocalizationHelper.GetStringFormat("TaskAppend.Error", LocalizationHelper.GetString(item.TaskType.ToString()), taskDisplayName) + "\n" + ex.Message, UiLogColor.Error);
+                AddLog(LocalizationHelper.GetStringFormat("TaskAppend.Error", LocalizationHelper.GetString(item.TaskType.ToString()), item.NameDisplay) + "\n" + ex.Message, UiLogColor.Error);
             }
         }
 
