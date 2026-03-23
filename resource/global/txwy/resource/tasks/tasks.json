@@ -759,9 +759,6 @@
     "PRTS3": {
         "text": ["角色"]
     },
-    "EndOfActionAnnihilation": {
-        "text": ["行動結束"]
-    },
     "MedicineExpiringTime": {
         "text": ["分鐘", "小時", "1天"],
         "ocrReplace": [

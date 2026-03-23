@@ -1388,10 +1388,8 @@
         "next": ["EndOfActionThenStop"]
     },
     "EndOfActionAnnihilation": {
-        "algorithm": "OcrDetect",
         "Doc": "本任务注册了插件 StageDropsTaskPlugin",
-        "text": ["行动结束"],
-        "roi": [0, 118, 409, 194],
+        "roi": [70, 70, 150, 160],
         "next": ["ClickCorner"]
     },
     "StageDrops": {
@@ -4023,6 +4021,11 @@
         "baseTask": "NumberOcrReplace",
         "text": [],
         "roi": [52, 52, 18, 18]
+    },
+    "StageDrops-AnnihilationWeeklyLimit": {
+        "baseTask": "NumberOcrReplace",
+        "roi": [530, 472, 100, 20],
+        "useRaw": true
     },
     "act24side_melding_1": {
         "baseTask": "StageDrops-StageCF-ItemMatch",
