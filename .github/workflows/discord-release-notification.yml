@@ -1,9 +1,6 @@
 name: Discord Release Notification
 
 on:
-  release:
-    types:
-      - published
   workflow_dispatch:
     inputs:
       release_tag:
@@ -24,18 +21,15 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ "${{ github.event_name }}" = "release" ]; then
-            TAG="${{ github.event.release.tag_name }}"
-            URL="${{ github.event.release.html_url }}"
+          MANUAL_TAG="${{ github.event.inputs.release_tag }}"
+          MANUAL_TAG="${MANUAL_TAG#"${MANUAL_TAG%%[![:space:]]*}"}"
+          MANUAL_TAG="${MANUAL_TAG%"${MANUAL_TAG##*[![:space:]]}"}"
+          if [ -z "$MANUAL_TAG" ]; then
+            TAG=$(gh release list --repo "${{ github.repository }}" --limit 1 --json tagName -q '.[0].tagName')
           else
-            MANUAL_TAG="${{ github.event.inputs.release_tag }}"
-            if [ -z "$MANUAL_TAG" ]; then
-              TAG=$(gh release list --repo "${{ github.repository }}" --limit 1 --json tagName -q '.[0].tagName')
-            else
-              TAG="$MANUAL_TAG"
-            fi
-            URL="https://github.com/MaaAssistantArknights/MaaAssistantArknights/releases/tag/$TAG"
+            TAG="$MANUAL_TAG"
           fi
+          URL="https://github.com/MaaAssistantArknights/MaaAssistantArknights/releases/tag/$TAG"
 
           echo "tag=$TAG" >> $GITHUB_OUTPUT
           echo "url=$URL" >> $GITHUB_OUTPUT
