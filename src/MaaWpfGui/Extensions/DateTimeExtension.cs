@@ -24,7 +24,7 @@ public static class DateTimeExtension
 {
     private const int YjDayStartHour = 4;
 
-    private static string ClientType => ConfigurationHelper.GetValue(ConfigurationKeys.ClientType, string.Empty);
+    private static string ClientType => ConfigurationHelper.GetValue(ConfigurationKeys.ClientType, Constants.Enums.ClientType.Official);
 
     private static readonly Dictionary<string, int> _clientTypeTimezone = new()
     {

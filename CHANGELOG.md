@@ -1,4 +1,4 @@
-## v6.6.0
+## v6.6.1
 
 ### 这次真的开箱即用了 | Highlight
 
@@ -81,6 +81,33 @@ We have optimized various aspects of emulator support:
 ----
 
 以下是详细内容：
+
+## v6.6.1
+
+### 新增 | New
+
+* 在手动更改任务名前任务名跟随语言变化 @ABA2396
+* 默认任务中添加更新数据任务 @ABA2396
+* add abs_rect to ocr logging results @Constrat
+
+### 改进 | Improved
+
+* 日志悬浮窗使用更轻量级实现，降低对目标窗口的影响 (#16073) @ABA2396
+* 激活周计划时, 禁用 `下拉框中隐藏当日不开放关卡` @status102 @ABA2396
+
+### 修复 | Fix
+
+* 第一次启动时任务列表为空 @ABA2396
+* 开始唤醒-手动切换 触发时无法添加任务 @status102
+
+### 其他 | Other
+
+* 配置迁移时不写入任务默认名称 @ABA2396
+* 关卡小提示中增加技能书库存提示 @ABA2396
+* KR update MistCity DepotEnter.png @HX3N
+* automate discord notification through release-ota @Constrat
+
+## v6.6.0
 
 ### 新增 | New
 

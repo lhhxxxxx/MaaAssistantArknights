@@ -966,7 +966,7 @@ public class TaskQueueViewModel : Screen
             var task = ConfigFactory.CurrentConfig.TaskQueue.ElementAt(i);
             if (task is not null)
             {
-                taskqueue.Add(new TaskItemViewModel(task.Name, task.IsEnable) { Index = i });
+                taskqueue.Add(new TaskItemViewModel(GetTaskDisplayName(task), task.IsEnable) { Index = i });
             }
         }
 
@@ -1291,14 +1291,23 @@ public class TaskQueueViewModel : Screen
     {
         if (Activator.CreateInstance(taskName) is BaseTask task)
         {
-            task.Name = TaskTypeList.FirstOrDefault(t => t.Value == taskName)?.Display ?? taskName.Name;
             ConfigFactory.CurrentConfig.TaskQueue.Add(task);
-            TaskItemViewModels.Add(new TaskItemViewModel(task.Name));
+            TaskItemViewModels.Add(new TaskItemViewModel(GetTaskDisplayName(task)));
         }
         else
         {
             AddLog("could NOT create instance of " + taskName, UiLogColor.Error);
         }
+    }
+
+    private static string GetTaskDisplayName(BaseTask task)
+    {
+        if (!string.IsNullOrWhiteSpace(task.Name))
+        {
+            return task.Name;
+        }
+
+        return LocalizationHelper.GetString(task.TaskType.ToString());
     }
 
     /// <summary>
@@ -1737,10 +1746,11 @@ public class TaskQueueViewModel : Screen
         foreach (var item in tasks)
         {
             var index = ConfigFactory.CurrentConfig.TaskQueue.IndexOf(item);
+            var taskDisplayName = GetTaskDisplayName(item);
             _logger.Information("Index {Index}, Type {TaskType}, Name {TaskName}, IsEnable {IsEnable}",
                 index,
                 item.TaskType,
-                item.Name,
+                taskDisplayName,
                 item.IsEnable);
             if (!IsTaskEnable(item))
             {
@@ -1755,16 +1765,15 @@ public class TaskQueueViewModel : Screen
                 {
                     case true:
                         ++count;
-                        Instances.TaskQueueViewModel.TaskItemViewModels[index].SetTaskIds(taskIds);
-                        // Instances.TaskQueueViewModel.TaskItemViewModels.ElementAtOrDefault(index)?.TaskId = taskId;
+                        Instances.TaskQueueViewModel.TaskItemViewModels.ElementAtOrDefault(index)?.SetTaskIds(taskIds);
                         break;
                     case false:
                         taskRet = false;
-                        AddLog(LocalizationHelper.GetStringFormat("TaskAppend.Error", LocalizationHelper.GetString(item.TaskType.ToString()), item.Name), UiLogColor.Error);
+                        AddLog(LocalizationHelper.GetStringFormat("TaskAppend.Error", LocalizationHelper.GetString(item.TaskType.ToString()), taskDisplayName), UiLogColor.Error);
                         SetTaskStatus(index, TaskItemStatus.Error);
                         break;
                     case null:
-                        AddLog(LocalizationHelper.GetStringFormat("TaskAppend.Skip", LocalizationHelper.GetString(item.TaskType.ToString()), item.Name), UiLogColor.Info);
+                        AddLog(LocalizationHelper.GetStringFormat("TaskAppend.Skip", LocalizationHelper.GetString(item.TaskType.ToString()), taskDisplayName), UiLogColor.Info);
                         SetTaskStatus(index, TaskItemStatus.Skipped);
                         break;
                 }
@@ -1772,7 +1781,7 @@ public class TaskQueueViewModel : Screen
             catch (Exception ex)
             {
                 taskRet = false;
-                AddLog(LocalizationHelper.GetStringFormat("TaskAppend.Error", LocalizationHelper.GetString(item.TaskType.ToString()), item.Name) + "\n" + ex.Message, UiLogColor.Error);
+                AddLog(LocalizationHelper.GetStringFormat("TaskAppend.Error", LocalizationHelper.GetString(item.TaskType.ToString()), taskDisplayName) + "\n" + ex.Message, UiLogColor.Error);
             }
         }
 

@@ -24,6 +24,11 @@ public class SpecificConfig : INotifyPropertyChanged, IJsonOnDeserialized
 {
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    public SpecificConfig()
+    {
+        EnsureDefaultTaskQueue();
+    }
+
     [JsonInclude]
     public ObservableDictionary<string, int> InfrastOrder { get; private set; } = [];
 
@@ -42,20 +47,26 @@ public class SpecificConfig : INotifyPropertyChanged, IJsonOnDeserialized
         PropertyChanged?.Invoke(this, new PropertyChangedEventDetailArgs(propertyName, before, after));
     }
 
-    public void OnDeserialized()
+    private void EnsureDefaultTaskQueue()
     {
         if (TaskQueue.Count > 0)
         {
             return;
         }
+
         TaskQueue.Add(new StartUpTask());
         TaskQueue.Add(new FightTask());
         TaskQueue.Add(new InfrastTask());
-        TaskQueue.Add(new FightTask());
         TaskQueue.Add(new RecruitTask());
         TaskQueue.Add(new MallTask());
         TaskQueue.Add(new AwardTask());
         TaskQueue.Add(new RoguelikeTask());
         TaskQueue.Add(new ReclamationTask());
+        TaskQueue.Add(new UserDataUpdateTask());
+    }
+
+    public void OnDeserialized()
+    {
+        EnsureDefaultTaskQueue();
     }
 }

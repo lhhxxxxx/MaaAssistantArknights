@@ -204,6 +204,7 @@ jobs:
   release:
     name: Publish to Release Mirrors
     needs:
+      - create-tag
       - make-ota
       - make-ota-mac
     runs-on: ubuntu-latest
@@ -213,3 +214,8 @@ jobs:
       - name: Setup release mirror
         run: |
           gh workflow --repo MaaAssistantArknights/MaaRelease run release-mirrors.yml
+
+      - name: Send Discord release notification
+        run: |
+          gh workflow --repo MaaAssistantArknights/MaaAssistantArknights run discord-release-notification.yml \
+            -f release_tag="${{ needs.create-tag.outputs.release_tag }}"
