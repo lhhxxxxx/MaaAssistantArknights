@@ -4022,11 +4022,6 @@
         "text": [],
         "roi": [52, 52, 18, 18]
     },
-    "StageDrops-AnnihilationWeeklyLimit": {
-        "baseTask": "NumberOcrReplace",
-        "roi": [530, 472, 100, 20],
-        "useRaw": true
-    },
     "act24side_melding_1": {
         "baseTask": "StageDrops-StageCF-ItemMatch",
         "template": "items/act24side_melding_1.png"
