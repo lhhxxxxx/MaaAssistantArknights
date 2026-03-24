@@ -1287,6 +1287,19 @@ public class TaskQueueViewModel : Screen
             new GenericCombinedData<Type> { Display = LocalizationHelper.GetString("Custom"), Value = typeof(CustomTask) },
         ]);
 
+    public void AddTaskQueueTask(Type taskName)
+    {
+        if (Activator.CreateInstance(taskName) is BaseTask task)
+        {
+            ConfigFactory.CurrentConfig.TaskQueue.Add(task);
+            TaskItemViewModels.Add(new TaskItemViewModel(task.NameDisplay));
+        }
+        else
+        {
+            AddLog("could NOT create instance of " + taskName, UiLogColor.Error);
+        }
+    }
+
     /// <summary>
     /// 重命名任务
     /// </summary>
