@@ -1389,7 +1389,7 @@
     },
     "EndOfActionAnnihilation": {
         "Doc": "本任务注册了插件 StageDropsTaskPlugin",
-        "roi": [70, 70, 150, 160],
+        "roi": [50, 50, 170, 180],
         "next": ["ClickCorner"]
     },
     "StageDrops": {
