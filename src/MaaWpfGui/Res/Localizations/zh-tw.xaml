@@ -593,7 +593,7 @@ HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Notifications\Settin
     <system:String x:Key="UseAlternateStage">使用備選關卡</system:String>
     <system:String x:Key="UseExpiringMedicine">無限吃 48 小時內過期的理智藥</system:String>
     <system:String x:Key="HideUnavailableStage">下拉選單中隱藏當日不開放關卡</system:String>
-    <system:String x:Key="FightStageResetMode">未開放關卡重設為</system:String>
+    <system:String x:Key="FightStageResetMode">過期關卡重設為</system:String>
     <system:String x:Key="HideSeries">隱藏代理倍率</system:String>
     <system:String x:Key="MainViewButtonFeature">主介面可選擇按鈕功能</system:String>
     <system:String x:Key="CustomStageCode">手動輸入關卡名稱</system:String>
