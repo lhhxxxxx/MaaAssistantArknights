@@ -937,6 +937,7 @@ public class ToolboxViewModel : Screen
     public void ResetDepotRecognitionState()
     {
         DepotClear();
+        LastDepotSyncTime = null;
     }
 
     /// <summary>
@@ -1342,6 +1343,7 @@ public class ToolboxViewModel : Screen
         _tempOperHaveSet = [];
         OperBoxHaveList = [];
         OperBoxNotHaveList = [];
+        LastOperBoxSyncTime = null;
     }
 
     /// <summary>

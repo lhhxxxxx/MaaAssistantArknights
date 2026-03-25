@@ -23,6 +23,7 @@ using MaaWpfGui.Constants.Enums;
 using MaaWpfGui.Extensions;
 using MaaWpfGui.Helper;
 using MaaWpfGui.Utilities.ValueType;
+using Stylet;
 
 namespace MaaWpfGui.ViewModels.UserControl.TaskQueue;
 
@@ -102,7 +103,7 @@ public class UserDataUpdateSettingsUserControlModel : TaskSettingsViewModel, Use
             bool ret = false;
             if (operBoxTriggerDue)
             {
-                Instances.ToolboxViewModel.ResetOperBoxRecognitionState();
+                Execute.OnUIThread(Instances.ToolboxViewModel.ResetOperBoxRecognitionState);
                 ret = Instances.ToolboxViewModel.StartOperBoxRecognitionTask(startImmediately: false);
                 if (!ret)
                 {
@@ -113,7 +114,7 @@ public class UserDataUpdateSettingsUserControlModel : TaskSettingsViewModel, Use
 
             if (depotTriggerDue)
             {
-                Instances.ToolboxViewModel.ResetDepotRecognitionState();
+                Execute.OnUIThread(Instances.ToolboxViewModel.ResetDepotRecognitionState);
                 ret = Instances.ToolboxViewModel.StartDepotRecognitionTask(false);
                 if (!ret)
                 {
