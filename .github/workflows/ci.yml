@@ -142,7 +142,7 @@ jobs:
         with:
           repository: MaaXYZ/MaaFramework
           latest: true
-          fileName: '*win-x86_64*.zip'
+          fileName: "*win-x86_64*.zip"
           extract: true
           out-file-path: MaaFramework-temp
 
@@ -152,7 +152,7 @@ jobs:
           cp MaaFramework-temp/bin/*Win32ControlUnit* install/
 
       - name: Setup .NET SDK
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           global-json-file: global.json
 
