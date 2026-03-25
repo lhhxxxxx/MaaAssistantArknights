@@ -299,7 +299,7 @@ public static class ConfigFactory
             if (o is BaseTask task)
             {
                 index = taskQueue.IndexOf(task);
-                taskName = task.Name;
+                taskName = task.NameDisplay;
             }
             OnPropertyChanged($"{key}[{index}]{taskName}({o?.GetType().Name})." + args.PropertyName, oldValue, newValue);
         };
