@@ -126,7 +126,7 @@ public class UserDataUpdateSettingsUserControlModel : TaskSettingsViewModel, Use
             return ret ? (true, ids) : (null, []);
         }
 
-        private static bool IsTriggerDue(DateTime? lastSyncTime, UserDataUpdateTriggerInterval triggerInterval)
+        private static bool IsTriggerDue(DateTimeOffset? lastSyncTime, UserDataUpdateTriggerInterval triggerInterval)
         {
             if (triggerInterval == UserDataUpdateTriggerInterval.EveryTime)
             {
@@ -138,8 +138,8 @@ public class UserDataUpdateSettingsUserControlModel : TaskSettingsViewModel, Use
                 return true;
             }
 
-            var now = DateTime.UtcNow.ToYjDate();
-            var lastDate = lastSyncTime.Value.ToYjDate();
+            var now = DateTimeOffset.UtcNow.ToYjDateTime().Date;
+            var lastDate = lastSyncTime.Value.ToYjDateTime().Date;
 
             return triggerInterval switch {
                 UserDataUpdateTriggerInterval.Daily => now > lastDate,

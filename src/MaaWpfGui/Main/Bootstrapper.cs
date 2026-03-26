@@ -619,8 +619,8 @@ public class Bootstrapper : Bootstrapper<RootViewModel>
 
         AchievementTrackerHelper.Events.Startup();
 
-        var buildTimeInterval = (DateTime.UtcNow - VersionUpdateSettingsUserControlModel.BuildDateTime).TotalDays;
-        var resourceTimeInterval = (DateTime.UtcNow - SettingsViewModel.VersionUpdateSettings.ResourceDateTime).TotalDays;
+        var buildTimeInterval = (DateTimeOffset.UtcNow - VersionUpdateSettingsUserControlModel.BuildDateTime).TotalDays;
+        var resourceTimeInterval = (DateTimeOffset.UtcNow - SettingsViewModel.VersionUpdateSettings.ResourceDateTime).TotalDays;
         var maxTimeInterval = Math.Max(buildTimeInterval, resourceTimeInterval);
         if (maxTimeInterval > 90)
         {
