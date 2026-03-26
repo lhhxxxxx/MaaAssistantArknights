@@ -515,6 +515,15 @@ public class ToolboxViewModel : Screen
     private bool _depotCacheInvalid = true;
     private string? _cachedArkPlannerResult;
     private string? _cachedLoliconResult;
+    private readonly HashSet<int> _pendingDepotSyncTimeResetTaskIds = [];
+
+    public void MarkDepotRecognitionSyncTimeForReset(int taskId)
+    {
+        if (taskId > 0)
+        {
+            _pendingDepotSyncTimeResetTaskIds.Add(taskId);
+        }
+    }
 
     /// <summary>
     /// 标记仓库缓存失效
@@ -668,12 +677,18 @@ public class ToolboxViewModel : Screen
     /// </summary>
     /// <param name="details">详细的 JSON 参数</param>
     /// <param name="updateSyncTime">是否更新同步时间为当前时间（从 Core 获取新数据时为 true，从本地加载时为 false）</param>
+    /// <param name="taskId">传入对应的任务 ID 以便在收到回调后重置识别状态</param>
     /// <returns>是否成功</returns>
-    public bool DepotParse(JObject? details, bool updateSyncTime = false)
+    public bool DepotParse(JObject? details, bool updateSyncTime = false, int taskId = 0)
     {
         if (details == null)
         {
             return false;
+        }
+
+        if (_pendingDepotSyncTimeResetTaskIds.Remove(taskId))
+        {
+            ResetDepotRecognitionState();
         }
 
         DepotResult.Clear();
@@ -758,7 +773,7 @@ public class ToolboxViewModel : Screen
         if (updateSyncTime)
         {
             // 从 Core 获取新数据，更新为当前 UTC 时间
-            AchievementTrackerHelper.Instance.CheckResyncAfterDays(LastDepotSyncTime, 7, AchievementIds.ResumeRecord);
+            AchievementTrackerHelper.Instance.CheckResyncAfterDays(LastDepotSyncTime?.UtcDateTime, 7, AchievementIds.ResumeRecord);
             LastDepotSyncTime = DateTimeOffset.UtcNow;
         }
         else
@@ -804,11 +819,13 @@ public class ToolboxViewModel : Screen
         DepotInfo = LocalizationHelper.GetString("CopiedToClipboard");
     }
 
+    /*
     private void DepotClear()
     {
         DepotResult.Clear();
         InvalidateDepotCache();
     }
+    */
 
     // 需要排除的物品 ID（不统计到仓库）
     private static readonly HashSet<string> ExcludedItemIds =
@@ -928,7 +945,8 @@ public class ToolboxViewModel : Screen
     /// </summary>
     public void ResetDepotRecognitionState()
     {
-        DepotClear();
+        // DepotParse 方法已经处理了数据清除和缓存失效，这里不需要重复调用
+        // DepotClear();
         LastDepotSyncTime = null;
     }
 
@@ -1249,12 +1267,43 @@ public class ToolboxViewModel : Screen
     /// 每次传进来的都是完整数据, 临时缓存去重
     /// </summary>
     private HashSet<string> _tempOperHaveSet = [];
+    private readonly HashSet<int> _pendingOperBoxRecognitionResetTaskIds = [];
 
-    public bool OperBoxParse(JObject? details, bool updateSyncTime = true)
+    public void MarkOperBoxRecognitionDataForReset(int taskId)
+    {
+        if (taskId > 0)
+        {
+            _pendingOperBoxRecognitionResetTaskIds.Add(taskId);
+        }
+    }
+
+    private void ClearOperBoxRecognitionData()
+    {
+        OperBoxSelectedIndex = 1;
+        _operBoxPotential = null;
+        _tempOperHaveSet = [];
+        OperBoxHaveList = [];
+        OperBoxNotHaveList = [];
+        LastOperBoxSyncTime = null;
+    }
+
+    /// <summary>
+    /// 解析干员识别结果
+    /// </summary>
+    /// <param name="details">新增的干员数据</param>
+    /// <param name="updateSyncTime">是否更新同步时间（从 Core 获取新数据时为 true，从本地加载时为 false）</param>
+    /// <param name="taskId">传入对应的任务 ID 以便在收到回调后重置识别状态</param>
+    /// <returns>是否成功</returns>
+    public bool OperBoxParse(JObject? details, bool updateSyncTime = true, int taskId = 0)
     {
         if (details == null)
         {
             return false;
+        }
+
+        if (_pendingOperBoxRecognitionResetTaskIds.Remove(taskId))
+        {
+            ResetOperBoxRecognitionState();
         }
 
         var ownOpers = (details["own_opers"] as JArray)?.ToObject<List<OperBoxData.OperData>>()?.Where(o => !string.IsNullOrEmpty(o.Id)).ToList();
@@ -1300,7 +1349,7 @@ public class ToolboxViewModel : Screen
 
         if (updateSyncTime)
         {
-            AchievementTrackerHelper.Instance.CheckResyncAfterDays(LastOperBoxSyncTime, 7, AchievementIds.ResumeRecord);
+            AchievementTrackerHelper.Instance.CheckResyncAfterDays(LastOperBoxSyncTime?.UtcDateTime, 7, AchievementIds.ResumeRecord);
             LastOperBoxSyncTime = DateTimeOffset.UtcNow;
         }
         else
@@ -1324,11 +1373,7 @@ public class ToolboxViewModel : Screen
     /// </summary>
     public void ResetOperBoxRecognitionState()
     {
-        OperBoxSelectedIndex = 1;
-        _operBoxPotential = null;
-        _tempOperHaveSet = [];
-        OperBoxHaveList = [];
-        OperBoxNotHaveList = [];
+        ClearOperBoxRecognitionData();
         LastOperBoxSyncTime = null;
     }
 

@@ -103,24 +103,28 @@ public class UserDataUpdateSettingsUserControlModel : TaskSettingsViewModel, Use
             bool ret = false;
             if (operBoxTriggerDue)
             {
-                Execute.OnUIThread(Instances.ToolboxViewModel.ResetOperBoxRecognitionState);
                 ret = Instances.ToolboxViewModel.StartOperBoxRecognitionTask(startImmediately: false);
                 if (!ret)
                 {
                     return (false, []);
                 }
-                ids.Add(Instances.AsstProxy.TasksStatus.Last().Key);
+
+                int operBoxTaskId = Instances.AsstProxy.TasksStatus.Last().Key;
+                Instances.ToolboxViewModel.MarkOperBoxRecognitionDataForReset(operBoxTaskId);
+                ids.Add(operBoxTaskId);
             }
 
             if (depotTriggerDue)
             {
-                Execute.OnUIThread(Instances.ToolboxViewModel.ResetDepotRecognitionState);
                 ret = Instances.ToolboxViewModel.StartDepotRecognitionTask(false);
                 if (!ret)
                 {
                     return (false, []);
                 }
-                ids.Add(Instances.AsstProxy.TasksStatus.Last().Key);
+
+                int depotTaskId = Instances.AsstProxy.TasksStatus.Last().Key;
+                Instances.ToolboxViewModel.MarkDepotRecognitionSyncTimeForReset(depotTaskId);
+                ids.Add(depotTaskId);
             }
 
             if (ret && operBoxTriggerDue && depotTriggerDue)

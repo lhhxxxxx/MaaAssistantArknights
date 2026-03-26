@@ -51,6 +51,7 @@ Besides DeepSleep, this update also fixes several small but noticeable issues.
 
 ### 改进 | Improved
 
+* 在收到对应识别结果时再重置库存数据 @ABA2396
 * 使用 DateTimeOffset 替代 DateTime @status102
 * Log 头时间从 UTC 时间改为 Local 时间 @status102
 * 不再默认启用 `在下拉框中隐藏当日未开放关卡` @status102
