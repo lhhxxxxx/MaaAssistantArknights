@@ -82,7 +82,7 @@ public class VersionUpdateSettingsUserControlModel : PropertyChangedBase
 
     public static string UiVersionDisplay => string.Join("\u200B", UiVersion.ToCharArray());
 
-    public static DateTime BuildDateTime { get; } = Assembly.GetExecutingAssembly().GetCustomAttribute<BuildDateTimeAttribute>()?.BuildDateTime ?? DateTime.MinValue;
+    public static DateTimeOffset BuildDateTime { get; } = Assembly.GetExecutingAssembly().GetCustomAttribute<BuildDateTimeAttribute>()?.BuildTime ?? DateTimeOffset.MinValue;
 
     public static string BuildDateTimeCurrentCultureString => BuildDateTime.ToLocalTimeString();
 

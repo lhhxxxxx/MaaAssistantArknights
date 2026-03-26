@@ -1672,8 +1672,8 @@ public class TaskQueueViewModel : Screen
         var resourceDateTimeLong = SettingsViewModel.VersionUpdateSettings.ResourceDateTimeCurrentCultureString;
         AddLog($"Build Time:\n{buildDateTimeLong}\nResource Time:\n{resourceDateTimeLong}");
 
-        var buildTimeInterval = (DateTime.UtcNow - VersionUpdateSettingsUserControlModel.BuildDateTime).TotalDays;
         var resourceTimeInterval = (DateTime.UtcNow - SettingsViewModel.VersionUpdateSettings.ResourceDateTime).TotalDays;
+        var buildTimeInterval = (DateTimeOffset.UtcNow - VersionUpdateSettingsUserControlModel.BuildDateTime).TotalDays;
         var maxTimeInterval = Math.Max(buildTimeInterval, resourceTimeInterval);
         if (maxTimeInterval > 90)
         {
