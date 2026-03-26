@@ -1,4 +1,32 @@
-## v6.7.0-beta.1
+## v6.7.0
+
+### 正式接入 DeepSleep | Highlight
+
+从 v6.7.0 开始，MAA 正式接入 DeepSleep。
+
+#### 多项细节问题一并修复
+
+除了 DeepSleep，本次更新也处理了一批影响体验的细节问题。
+
+* 修复任务开始/完成时无法显示任务名的问题；
+* 修复在非 UI 线程清空库存数据可能导致任务添加失败的问题；
+* 修复多项剿灭相关识别与战斗完成 ROI 问题。
+
+----
+
+Starting with v6.7.0, MAA officially introduces DeepSleep.
+
+#### Various UX Fixes Included
+
+Besides DeepSleep, this update also fixes several small but noticeable issues.
+
+* Fix missing task names when tasks start or finish;
+* Fix task creation failures caused by clearing depot data off the UI thread;
+* Fix several issues related to Annihilation recognition and completion ROI.
+
+----
+
+以下是详细内容：
 
 ### 新增 | New
 
