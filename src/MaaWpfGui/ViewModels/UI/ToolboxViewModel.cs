@@ -475,16 +475,10 @@ public class ToolboxViewModel : Screen
         set => SetAndNotify(ref _depotInfo, value);
     }
 
-    private DateTime? _lastDepotSyncTime;
-
     /// <summary>
     /// Gets or sets 上次仓库同步时间（UTC 时间）
     /// </summary>
-    public DateTime? LastDepotSyncTime
-    {
-        get => _lastDepotSyncTime;
-        set => SetAndNotify(ref _lastDepotSyncTime, value);
-    }
+    public DateTimeOffset? LastDepotSyncTime { get => field; set => SetAndNotify(ref field, value); }
 
     /// <summary>
     /// Gets 上次仓库同步时间的显示文本（本地时间）
@@ -499,8 +493,7 @@ public class ToolboxViewModel : Screen
             }
 
             // 将 UTC 时间转换为本地时间显示
-            var localTime = LastDepotSyncTime.Value.ToLocalTime();
-            return localTime.ToString();
+            return LastDepotSyncTime.Value.ToLocalTimeString();
         }
     }
 
@@ -713,9 +706,7 @@ public class ToolboxViewModel : Screen
         {
             if (depotItems.Count == 0)
             {
-                var arkplannerItems = details["arkplanner"]?["object"]?["items"]
-                                          ?.Cast<JObject>()
-                                      ?? [];
+                var arkplannerItems = details["arkplanner"]?["object"]?["items"]?.Cast<JObject>() ?? [];
 
                 foreach (var item in arkplannerItems)
                 {
@@ -767,14 +758,14 @@ public class ToolboxViewModel : Screen
         if (updateSyncTime)
         {
             // 从 Core 获取新数据，更新为当前 UTC 时间
-            LastDepotSyncTime = DateTime.UtcNow;
+            LastDepotSyncTime = DateTimeOffset.UtcNow;
         }
         else
         {
             // 从本地加载，读取保存的时间
             var syncTimeStr = details["syncTime"]?.ToString(Formatting.None)?.Trim('"');
             if (!string.IsNullOrEmpty(syncTimeStr) &&
-                DateTime.TryParseExact(syncTimeStr, "O", null, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
+                DateTimeOffset.TryParseExact(syncTimeStr, "O", null, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
                 out var lastDepotSyncTime))
             {
                 LastDepotSyncTime = lastDepotSyncTime;
@@ -937,6 +928,7 @@ public class ToolboxViewModel : Screen
     public void ResetDepotRecognitionState()
     {
         DepotClear();
+        LastDepotSyncTime = null;
     }
 
     /// <summary>
@@ -982,19 +974,13 @@ public class ToolboxViewModel : Screen
 
     #region OperBox
 
-    private DateTime? _lastOperBoxSyncTime;
-
     /// <summary>
-    /// Gets or sets 上次干员同步时间（UTC 时间）
+    /// Gets or sets 上次干员同步时间
     /// </summary>
-    public DateTime? LastOperBoxSyncTime
-    {
-        get => _lastOperBoxSyncTime;
-        set => SetAndNotify(ref _lastOperBoxSyncTime, value);
-    }
+    public DateTimeOffset? LastOperBoxSyncTime { get => field; set => SetAndNotify(ref field, value); }
 
     /// <summary>
-    /// Gets 上次干员同步时间的显示文本（本地时间）
+    /// Gets 上次干员同步时间的显示文本
     /// </summary>
     [PropertyDependsOn(nameof(LastOperBoxSyncTime))]
     public string LastOperBoxSyncTimeText
@@ -1005,8 +991,7 @@ public class ToolboxViewModel : Screen
                 return string.Empty;
             }
 
-            var localTime = LastOperBoxSyncTime.Value.ToLocalTime();
-            return localTime.ToString();
+            return LastOperBoxSyncTime.Value.ToLocalTimeString();
         }
     }
 
@@ -1314,13 +1299,13 @@ public class ToolboxViewModel : Screen
 
         if (updateSyncTime)
         {
-            LastOperBoxSyncTime = DateTime.UtcNow;
+            LastOperBoxSyncTime = DateTimeOffset.UtcNow;
         }
         else
         {
             var syncTimeStr = details["syncTime"]?.ToString(Formatting.None)?.Trim('"');
             if (!string.IsNullOrEmpty(syncTimeStr) &&
-                DateTime.TryParseExact(syncTimeStr, "O", null, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var lastOperBoxSyncTime))
+                DateTimeOffset.TryParseExact(syncTimeStr, "O", null, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var lastOperBoxSyncTime))
             {
                 LastOperBoxSyncTime = lastOperBoxSyncTime;
             }
@@ -1342,6 +1327,7 @@ public class ToolboxViewModel : Screen
         _tempOperHaveSet = [];
         OperBoxHaveList = [];
         OperBoxNotHaveList = [];
+        LastOperBoxSyncTime = null;
     }
 
     /// <summary>

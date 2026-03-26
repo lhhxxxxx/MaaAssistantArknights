@@ -270,6 +270,8 @@ public class TaskQueueViewModel : Screen
     /// </summary>
     public ObservableCollection<LogCardItemViewModel> LogCardViewModels { get; private set; } = [];
 
+    private static readonly Random _logRandom = new();
+
     private bool TryMergeIntoLastCard(string content, string color, string weight, ToolTip? toolTip)
     {
         // Merge into last existing card when it exists and is not sealed.
@@ -280,8 +282,23 @@ public class TaskQueueViewModel : Screen
 
         var lastCard = LogCardViewModels[^1];
         var log = new LogItemViewModel(content, color, weight, toolTip: toolTip);
+
+        var isAprilFools = DateTime.UtcNow.ToYjDate().IsAprilFoolsDay();
+        if (isAprilFools)
+        {
+            log.Content = "thinking...";
+        }
+
         LogItemViewModels.Add(log);
         lastCard.Items.Add(log);
+
+        if (isAprilFools)
+        {
+            Execute.OnUIThread(async () => {
+                await Task.Delay(_logRandom.Next(1000, 5000));
+                log.Content = content;
+            });
+        }
         return true;
     }
 
@@ -756,6 +773,7 @@ public class TaskQueueViewModel : Screen
 
         _isUpdatingDatePrompt = true;
         UpdateDatePromptAndStagesLocally();
+        Execute.OnUIThread(() => NotifyOfPropertyChange(nameof(ShowDeepSleepIcon)));
 
         var delayTime = CalculateRandomDelay();
         _ = Task.Run(async () => {
@@ -966,7 +984,7 @@ public class TaskQueueViewModel : Screen
             var task = ConfigFactory.CurrentConfig.TaskQueue.ElementAt(i);
             if (task is not null)
             {
-                taskqueue.Add(new TaskItemViewModel(GetTaskDisplayName(task), task.IsEnable) { Index = i });
+                taskqueue.Add(new TaskItemViewModel(task.NameDisplay, task.IsEnable) { Index = i });
             }
         }
 
@@ -990,6 +1008,8 @@ public class TaskQueueViewModel : Screen
     }
 
     public DayOfWeek CurDayOfWeek { get; private set; }
+
+    public bool ShowDeepSleepIcon => DateTime.UtcNow.ToYjDate().IsAprilFoolsDay();
 
     /// <summary>
     /// Determine whether the specified stage is open
@@ -1292,22 +1312,12 @@ public class TaskQueueViewModel : Screen
         if (Activator.CreateInstance(taskName) is BaseTask task)
         {
             ConfigFactory.CurrentConfig.TaskQueue.Add(task);
-            TaskItemViewModels.Add(new TaskItemViewModel(GetTaskDisplayName(task)));
+            TaskItemViewModels.Add(new TaskItemViewModel(task.NameDisplay));
         }
         else
         {
             AddLog("could NOT create instance of " + taskName, UiLogColor.Error);
         }
-    }
-
-    private static string GetTaskDisplayName(BaseTask task)
-    {
-        if (!string.IsNullOrWhiteSpace(task.Name))
-        {
-            return task.Name;
-        }
-
-        return LocalizationHelper.GetString(task.TaskType.ToString());
     }
 
     /// <summary>
@@ -1336,13 +1346,16 @@ public class TaskQueueViewModel : Screen
         if (result == true && !string.IsNullOrWhiteSpace(dialog.InputText))
         {
             var newName = dialog.InputText.Trim().Replace("\r", string.Empty).Replace("\n", string.Empty);
-            taskItem.Name = newName;
             if (taskItem.Index < ConfigFactory.CurrentConfig.TaskQueue.Count)
             {
                 ConfigFactory.CurrentConfig.TaskQueue[taskItem.Index].Name = newName;
+                taskItem.Name = ConfigFactory.CurrentConfig.TaskQueue[taskItem.Index].NameDisplay;
+                AddLog(LocalizationHelper.GetStringFormat("TaskRenamed", newName), UiLogColor.Info);
             }
-
-            AddLog(string.Format(LocalizationHelper.GetString("TaskRenamed"), newName), UiLogColor.Info);
+            else
+            {
+                AddLog("Rename failed", UiLogColor.Error);
+            }
         }
     }
 
@@ -1679,8 +1692,8 @@ public class TaskQueueViewModel : Screen
         var resourceDateTimeLong = SettingsViewModel.VersionUpdateSettings.ResourceDateTimeCurrentCultureString;
         AddLog($"Build Time:\n{buildDateTimeLong}\nResource Time:\n{resourceDateTimeLong}");
 
-        var buildTimeInterval = (DateTime.UtcNow - VersionUpdateSettingsUserControlModel.BuildDateTime).TotalDays;
-        var resourceTimeInterval = (DateTime.UtcNow - SettingsViewModel.VersionUpdateSettings.ResourceDateTime).TotalDays;
+        var buildTimeInterval = (DateTimeOffset.UtcNow - VersionUpdateSettingsUserControlModel.BuildDateTime).TotalDays;
+        var resourceTimeInterval = (DateTimeOffset.UtcNow - SettingsViewModel.VersionUpdateSettings.ResourceDateTime).TotalDays;
         var maxTimeInterval = Math.Max(buildTimeInterval, resourceTimeInterval);
         if (maxTimeInterval > 90)
         {
@@ -1746,11 +1759,10 @@ public class TaskQueueViewModel : Screen
         foreach (var item in tasks)
         {
             var index = ConfigFactory.CurrentConfig.TaskQueue.IndexOf(item);
-            var taskDisplayName = GetTaskDisplayName(item);
             _logger.Information("Index {Index}, Type {TaskType}, Name {TaskName}, IsEnable {IsEnable}",
                 index,
                 item.TaskType,
-                taskDisplayName,
+                item.NameDisplay,
                 item.IsEnable);
             if (!IsTaskEnable(item))
             {
@@ -1769,11 +1781,11 @@ public class TaskQueueViewModel : Screen
                         break;
                     case false:
                         taskRet = false;
-                        AddLog(LocalizationHelper.GetStringFormat("TaskAppend.Error", LocalizationHelper.GetString(item.TaskType.ToString()), taskDisplayName), UiLogColor.Error);
+                        AddLog(LocalizationHelper.GetStringFormat("TaskAppend.Error", LocalizationHelper.GetString(item.TaskType.ToString()), item.NameDisplay), UiLogColor.Error);
                         SetTaskStatus(index, TaskItemStatus.Error);
                         break;
                     case null:
-                        AddLog(LocalizationHelper.GetStringFormat("TaskAppend.Skip", LocalizationHelper.GetString(item.TaskType.ToString()), taskDisplayName), UiLogColor.Info);
+                        AddLog(LocalizationHelper.GetStringFormat("TaskAppend.Skip", LocalizationHelper.GetString(item.TaskType.ToString()), item.NameDisplay), UiLogColor.Info);
                         SetTaskStatus(index, TaskItemStatus.Skipped);
                         break;
                 }
@@ -1781,7 +1793,7 @@ public class TaskQueueViewModel : Screen
             catch (Exception ex)
             {
                 taskRet = false;
-                AddLog(LocalizationHelper.GetStringFormat("TaskAppend.Error", LocalizationHelper.GetString(item.TaskType.ToString()), taskDisplayName) + "\n" + ex.Message, UiLogColor.Error);
+                AddLog(LocalizationHelper.GetStringFormat("TaskAppend.Error", LocalizationHelper.GetString(item.TaskType.ToString()), item.NameDisplay) + "\n" + ex.Message, UiLogColor.Error);
             }
         }
 

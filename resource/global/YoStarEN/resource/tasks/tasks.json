@@ -1067,10 +1067,6 @@
         "text": ["Unit Limit"],
         "roi": [1144, 545, 135, 32]
     },
-    "EndOfActionAnnihilation": {
-        "text": ["MISSION", "RESULTS"],
-        "roi": [13, 126, 386, 208]
-    },
     "MedicineExpiringTime": {
         "text": ["min", "hr", "1days"],
         "ocrReplace": [

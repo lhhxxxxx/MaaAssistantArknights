@@ -15,6 +15,7 @@ using System.ComponentModel;
 using System.Text.Json.Serialization;
 using JetBrains.Annotations;
 using MaaWpfGui.Configuration.Factory;
+using MaaWpfGui.Helper;
 using static MaaWpfGui.Main.AsstProxy;
 
 namespace MaaWpfGui.Configuration.Single.MaaTask;
@@ -41,6 +42,9 @@ public class BaseTask : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public string Name { get; set; } = string.Empty;
+
+    [JsonIgnore]
+    public string NameDisplay => string.IsNullOrEmpty(Name) ? LocalizationHelper.GetString(TaskType.ToString()) : Name;
 
     public bool? IsEnable { get; set; } = true;
 

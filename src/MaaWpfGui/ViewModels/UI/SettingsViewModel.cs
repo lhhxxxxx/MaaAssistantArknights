@@ -508,15 +508,26 @@ public class SettingsViewModel : Screen
     {
         get => _currentConfiguration;
         set {
+            if (string.IsNullOrEmpty(value) || value == _currentConfiguration)
+            {
+                return;
+            }
+
+            var previousConfiguration = _currentConfiguration;
             bool ret = ConfigurationHelper.SwitchConfiguration(value);
             ret &= ConfigFactory.SwitchConfig(value);
 
             if (!ret)
             {
-                ConfigurationHelper.SwitchConfiguration(_currentConfiguration);
-                ConfigFactory.SwitchConfig(_currentConfiguration);
+                if (!string.IsNullOrEmpty(previousConfiguration))
+                {
+                    ConfigurationHelper.SwitchConfiguration(previousConfiguration);
+                    ConfigFactory.SwitchConfig(previousConfiguration);
+                }
+
                 return;
             }
+
             SetAndNotify(ref _currentConfiguration, value);
             Bootstrapper.ShutdownAndRestartWithoutArgs();
         }

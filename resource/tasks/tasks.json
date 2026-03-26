@@ -1388,10 +1388,8 @@
         "next": ["EndOfActionThenStop"]
     },
     "EndOfActionAnnihilation": {
-        "algorithm": "OcrDetect",
         "Doc": "本任务注册了插件 StageDropsTaskPlugin",
-        "text": ["行动结束"],
-        "roi": [0, 118, 409, 194],
+        "roi": [50, 50, 170, 180],
         "next": ["ClickCorner"]
     },
     "StageDrops": {
@@ -4376,9 +4374,9 @@
         "binThreshold": [180, 255],
         "roi": [33, 272, 85, 36],
         "ocrReplace": [
-            ["LT(?=\\d)", "LT-"],
             ["Lt", "LT"],
-            ["LT\\+", "LT-"]
+            ["LT(?=\\d)", "LT-"],
+            ["LT[^\\d]{0,3}(?=\\d)", "LT-"]
         ]
     },
     "SSSCloseTip": {

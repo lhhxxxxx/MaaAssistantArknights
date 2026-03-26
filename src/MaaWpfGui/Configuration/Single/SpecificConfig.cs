@@ -26,7 +26,7 @@ public class SpecificConfig : INotifyPropertyChanged, IJsonOnDeserialized
 
     public SpecificConfig()
     {
-        EnsureDefaultTaskQueue();
+        AddDefaultTasks();
     }
 
     [JsonInclude]
@@ -47,13 +47,8 @@ public class SpecificConfig : INotifyPropertyChanged, IJsonOnDeserialized
         PropertyChanged?.Invoke(this, new PropertyChangedEventDetailArgs(propertyName, before, after));
     }
 
-    private void EnsureDefaultTaskQueue()
+    private void AddDefaultTasks()
     {
-        if (TaskQueue.Count > 0)
-        {
-            return;
-        }
-
         TaskQueue.Add(new StartUpTask());
         TaskQueue.Add(new FightTask());
         TaskQueue.Add(new InfrastTask());
@@ -67,6 +62,10 @@ public class SpecificConfig : INotifyPropertyChanged, IJsonOnDeserialized
 
     public void OnDeserialized()
     {
-        EnsureDefaultTaskQueue();
+        if (TaskQueue.Count > 0)
+        {
+            return;
+        }
+        AddDefaultTasks();
     }
 }
