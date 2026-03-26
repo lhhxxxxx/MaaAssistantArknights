@@ -287,7 +287,7 @@ public class TaskQueueViewModel : Screen
         var isAprilFools = DateTime.UtcNow.ToYjDate().IsAprilFoolsDay();
         if (isAprilFools)
         {
-            log.Content = "thinking...";
+            log.Content = "thinking 🤔";
         }
 
         LogItemViewModels.Add(log);
@@ -295,9 +295,15 @@ public class TaskQueueViewModel : Screen
 
         if (isAprilFools)
         {
-            Execute.OnUIThread(async () => {
-                await Task.Delay(_logRandom.Next(1000, 5000));
-                log.Content = content;
+            Execute.OnUIThread(async () =>
+            {
+                await Task.Delay(_logRandom.Next(800, 1500));
+                log.Content = string.Empty;
+                foreach (var ch in content)
+                {
+                    log.Content += ch;
+                    await Task.Delay(_logRandom.Next(10, 35));
+                }
             });
         }
         return true;
