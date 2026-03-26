@@ -283,7 +283,8 @@ public class TaskQueueViewModel : Screen
         var lastCard = LogCardViewModels[^1];
         var log = new LogItemViewModel(content, color, weight, toolTip: toolTip);
 
-        if (DateTime.UtcNow.ToYjDate().IsAprilFoolsDay())
+        var isAprilFools = DateTime.UtcNow.ToYjDate().IsAprilFoolsDay();
+        if (isAprilFools)
         {
             log.Content = "thinking...";
         }
@@ -291,7 +292,7 @@ public class TaskQueueViewModel : Screen
         LogItemViewModels.Add(log);
         lastCard.Items.Add(log);
 
-        if (DateTime.UtcNow.ToYjDate().IsAprilFoolsDay())
+        if (isAprilFools)
         {
             Execute.OnUIThread(async () => {
                 await Task.Delay(_logRandom.Next(1000, 5000));
