@@ -22,6 +22,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Markup;
 using MaaWpfGui.Constants;
+using MaaWpfGui.Extensions;
 
 namespace MaaWpfGui.Helper;
 
@@ -124,6 +125,17 @@ public static class LocalizationHelper
             {
                 break;
             }
+        }
+
+        if (DateTime.UtcNow.ToYjDate().IsAprilFoolsDay())
+        {
+            var cur = "DeepSleep";
+            var dictionary = new ResourceDictionary {
+                Source = new($@"Res\Localizations\{cur}.xaml", UriKind.Relative),
+            };
+            _preprocessedCultures.Add(cur);
+            PreprocessDictionary(dictionary, cur);
+            Application.Current.Resources.MergedDictionaries.Add(dictionary);
         }
 
         try
