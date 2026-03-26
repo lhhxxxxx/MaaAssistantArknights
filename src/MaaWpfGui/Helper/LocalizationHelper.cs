@@ -48,8 +48,7 @@ public static class LocalizationHelper
     /// </summary>
     public static string DefaultLanguage
     {
-        get
-        {
+        get {
             var local = CultureInfo.CurrentCulture.Name.ToLower();
             if (SupportedLanguages.ContainsKey(local))
             {
@@ -74,8 +73,7 @@ public static class LocalizationHelper
 
     public static CultureInfo CustomCultureInfo
     {
-        get
-        {
+        get {
             if (string.IsNullOrEmpty(_customCulture))
             {
                 return CultureInfo.CurrentCulture;
@@ -95,8 +93,7 @@ public static class LocalizationHelper
     {
         if (_culture == "pallas")
         {
-            var dictionary = new ResourceDictionary
-            {
+            var dictionary = new ResourceDictionary {
                 Source = new(@"Res\Localizations\zh-cn.xaml", UriKind.Relative),
             };
             foreach (var key in dictionary.Keys)
@@ -108,8 +105,7 @@ public static class LocalizationHelper
             return;
         }
 
-        string[] cultureList = _culture switch
-        {
+        string[] cultureList = _culture switch {
             "zh-cn" => [_culture],
             "zh-tw" => ["zh-cn", _culture],
             "en-us" => ["zh-cn", _culture],
@@ -118,8 +114,7 @@ public static class LocalizationHelper
 
         foreach (var cur in cultureList)
         {
-            var dictionary = new ResourceDictionary
-            {
+            var dictionary = new ResourceDictionary {
                 Source = new($@"Res\Localizations\{cur}.xaml", UriKind.Relative),
             };
             _preprocessedCultures.Add(cur);
@@ -211,8 +206,7 @@ public static class LocalizationHelper
         {
             try
             {
-                var dictionary = new ResourceDictionary
-                {
+                var dictionary = new ResourceDictionary {
                     Source = new($@"Res\Localizations\{culture}.xaml", UriKind.Relative),
                 };
 
@@ -298,8 +292,7 @@ public static class LocalizationHelper
 
         visited.Push(currentKey);
 
-        var result = Regex.Replace(input, @"\{key=(\w+)\}", match =>
-        {
+        var result = Regex.Replace(input, @"\{key=(\w+)\}", match => {
             var innerKey = match.Groups[1].Value;
             var innerValue = GetString(innerKey, culture);
             return ResolveNestedKeys(innerKey, innerValue, culture, visited);
@@ -327,8 +320,7 @@ public static class LocalizationHelper
     public static string FormatVersion(string? version, DateTime dateTime)
     {
         dateTime = dateTime.ToLocalTime();
-        return CustomCultureInfo.Name.ToLowerInvariant() switch
-        {
+        return CustomCultureInfo.Name.ToLowerInvariant() switch {
             "zh-cn" => $"{version}{dateTime:#MMdd}",
             "zh-tw" => $"{version}{dateTime:#MMdd}",
             "en-us" => $"{dateTime:dd/MM} {version}",
@@ -336,12 +328,24 @@ public static class LocalizationHelper
         };
     }
 
-    public static string FormatDateTime(DateTime dateTime)
+    public static string FormatVersion(string? version, DateTimeOffset dateTime)
     {
-        return CustomCultureInfo.Name.ToLowerInvariant() switch
-        {
-            "en-us" => dateTime.ToString("yyyy/MM/dd"),
-            _ => dateTime.ToString(CustomCultureInfo.DateTimeFormat.ShortDatePattern),
+        dateTime = dateTime.ToLocalTime();
+        return CustomCultureInfo.Name.ToLowerInvariant() switch {
+            "zh-cn" => $"{version}{dateTime:#MMdd}",
+            "zh-tw" => $"{version}{dateTime:#MMdd}",
+            "en-us" => $"{dateTime:dd/MM} {version}",
+            _ => $"{dateTime.ToString(CustomCultureInfo.DateTimeFormat.ShortDatePattern.Replace("yyyy", string.Empty).Trim('/', '.'))} {version}",
         };
     }
+
+    public static string FormatDateTime(DateTime dateTime) => CustomCultureInfo.Name.ToLowerInvariant() switch {
+        "en-us" => dateTime.ToString("yyyy/MM/dd"),
+        _ => dateTime.ToString(CustomCultureInfo.DateTimeFormat.ShortDatePattern),
+    };
+
+    public static string FormatDateTime(DateTimeOffset dateTime) => CustomCultureInfo.Name.ToLowerInvariant() switch {
+        "en-us" => dateTime.ToString("yyyy/MM/dd"),
+        _ => dateTime.ToString(CustomCultureInfo.DateTimeFormat.ShortDatePattern),
+    };
 }
