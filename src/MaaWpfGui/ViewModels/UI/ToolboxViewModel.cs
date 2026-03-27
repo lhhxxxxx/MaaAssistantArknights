@@ -560,18 +560,9 @@ public class ToolboxViewModel : Screen
     private void SaveDepotDetails()
     {
         // 构建简化格式：{"itemId": count}
-        var depotData = new JObject();
-        foreach (var item in DepotResult)
-        {
-            if (item.Count >= 0)
-            {
-                depotData[item.Id] = item.Count;
-            }
-        }
-
         var details = new JObject {
             ["done"] = true,
-            ["data"] = depotData,
+            ["data"] = JObject.FromObject(DepotResult.Where(item => item.Count >= 0).ToDictionary(item => item.Id, item => item.Count)),
         };
 
         // 保存同步时间为 UTC（如果有）
