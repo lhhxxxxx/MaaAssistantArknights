@@ -1202,6 +1202,10 @@ public partial class CopilotViewModel : Screen
             if (GetCopilotType(stageId) is CopilotType type and not CopilotType.Unknown)
             {
                 CopilotTabIndex = (int)type;
+                if (copilotList)
+                {
+                    UseCopilotList = CopilotTabIndex is 0 or 2;
+                }
             }
         }
 
@@ -1363,8 +1367,6 @@ public partial class CopilotViewModel : Screen
                 await AddSSSCopilotTaskToList(sss, copilotId);
             }
         }
-
-        UseCopilotList = CopilotTabIndex is 0 or 2;
 
         Log(copilotSet.Name, copilotSet.Description);
         _copilotCache = null;
