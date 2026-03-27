@@ -571,7 +571,7 @@ public class ToolboxViewModel : Screen
 
         var details = new JObject {
             ["done"] = true,
-            ["data"] = depotData.ToString(Formatting.None),
+            ["data"] = depotData,
         };
 
         // 保存同步时间为 UTC（如果有）
@@ -696,13 +696,23 @@ public class ToolboxViewModel : Screen
         Dictionary<string, int> depotItems = [];
 
         // 尝试解析新格式
-        var dataStr = details["data"]?.ToString();
-        if (!string.IsNullOrEmpty(dataStr))
+        var dataToken = details["data"];
+        if (dataToken is JObject dataObj)
+        {
+            foreach (var prop in dataObj.Properties())
+            {
+                if (int.TryParse(prop.Value.ToString(), out var count))
+                {
+                    depotItems[prop.Name] = count;
+                }
+            }
+        }
+        else if (dataToken?.ToString() is string dataStr && !string.IsNullOrEmpty(dataStr)) // 旧版格式迁移
         {
             try
             {
-                var dataObj = JObject.Parse(dataStr);
-                foreach (var prop in dataObj.Properties())
+                var dataO = JObject.Parse(dataStr);
+                foreach (var prop in dataO.Properties())
                 {
                     if (int.TryParse(prop.Value.ToString(), out var count))
                     {
