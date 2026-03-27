@@ -568,7 +568,7 @@ public class ToolboxViewModel : Screen
         // 保存同步时间为 UTC（如果有）
         if (LastDepotSyncTime.HasValue)
         {
-            details["syncTime"] = LastDepotSyncTime.Value.ToString("o"); // ISO 8601 格式
+            details["syncTime"] = LastDepotSyncTime.Value.ToLocalTime().ToString("o"); // ISO 8601 格式
         }
 
         JsonDataHelper.Set(JsonDataKey.DepotData, details);
@@ -781,9 +781,7 @@ public class ToolboxViewModel : Screen
         {
             // 从本地加载，读取保存的时间
             var syncTimeStr = details["syncTime"]?.ToString(Formatting.None)?.Trim('"');
-            if (!string.IsNullOrEmpty(syncTimeStr) &&
-                DateTimeOffset.TryParseExact(syncTimeStr, "O", null, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
-                out var lastDepotSyncTime))
+            if (!string.IsNullOrEmpty(syncTimeStr) && DateTimeOffset.TryParse(syncTimeStr, null, DateTimeStyles.AssumeUniversal, out var lastDepotSyncTime))
             {
                 LastDepotSyncTime = lastDepotSyncTime;
             }
@@ -1169,7 +1167,7 @@ public class ToolboxViewModel : Screen
 
         if (LastOperBoxSyncTime.HasValue)
         {
-            data["syncTime"] = LastOperBoxSyncTime.Value.ToString("o");
+            data["syncTime"] = LastOperBoxSyncTime.Value.ToLocalTime().ToString("o");
         }
 
         JsonDataHelper.Set(JsonDataKey.OperBoxData, data);
@@ -1356,8 +1354,7 @@ public class ToolboxViewModel : Screen
         else
         {
             var syncTimeStr = details["syncTime"]?.ToString(Formatting.None)?.Trim('"');
-            if (!string.IsNullOrEmpty(syncTimeStr) &&
-                DateTimeOffset.TryParseExact(syncTimeStr, "O", null, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var lastOperBoxSyncTime))
+            if (!string.IsNullOrEmpty(syncTimeStr) && DateTimeOffset.TryParse(syncTimeStr, null, DateTimeStyles.AssumeUniversal, out var lastOperBoxSyncTime))
             {
                 LastOperBoxSyncTime = lastOperBoxSyncTime;
             }
