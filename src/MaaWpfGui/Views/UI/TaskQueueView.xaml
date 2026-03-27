@@ -421,9 +421,11 @@
                         <Button.Style>
                             <Style BasedOn="{StaticResource MaaButtonDefaultStyle}" TargetType="Button">
                                 <Setter Property="hc:IconElement.Geometry" Value="{x:Null}" />
+                                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding ShowDeepSleepIcon}" Value="True">
                                         <Setter Property="hc:IconElement.Geometry" Value="{StaticResource DeepSleep}" />
+                                        <Setter Property="Foreground" Value="{DynamicResource DeepSleepBrush}" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
