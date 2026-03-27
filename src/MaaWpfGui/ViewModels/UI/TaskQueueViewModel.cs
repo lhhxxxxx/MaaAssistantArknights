@@ -148,6 +148,7 @@ public class TaskQueueViewModel : Screen
         Application.Current.Dispatcher.InvokeAsync(() => {
             if (e.Action == NotifyCollectionChangedAction.Move)
             {
+                AchievementTrackerHelper.Instance.Unlock(AchievementIds.SortingMaster);
                 int oldIndex = e.OldStartingIndex;
                 int newIndex = e.NewStartingIndex;
 
@@ -286,7 +287,7 @@ public class TaskQueueViewModel : Screen
         var isAprilFools = DateTime.UtcNow.ToYjDate().IsAprilFoolsDay();
         if (isAprilFools)
         {
-            log.Content = "thinking...";
+            log.Content = "thinking 🤔";
         }
 
         LogItemViewModels.Add(log);
@@ -294,9 +295,15 @@ public class TaskQueueViewModel : Screen
 
         if (isAprilFools)
         {
-            Execute.OnUIThread(async () => {
-                await Task.Delay(_logRandom.Next(1000, 5000));
-                log.Content = content;
+            Execute.OnUIThread(async () =>
+            {
+                await Task.Delay(_logRandom.Next(800, 1500));
+                log.Content = string.Empty;
+                foreach (var ch in content)
+                {
+                    log.Content += ch;
+                    await Task.Delay(_logRandom.Next(10, 35));
+                }
             });
         }
         return true;
@@ -1313,6 +1320,10 @@ public class TaskQueueViewModel : Screen
         {
             ConfigFactory.CurrentConfig.TaskQueue.Add(task);
             TaskItemViewModels.Add(new TaskItemViewModel(task.NameDisplay));
+            AchievementTrackerHelper.Instance.Unlock(AchievementIds.QueueExpansion);
+            AchievementTrackerHelper.Instance.TrackManualTaskAddition(
+                task.TaskType.ToString(),
+                ShowDebugTask ? TaskTypeList.Count : TaskTypeList.Count - 1);
         }
         else
         {
@@ -1385,6 +1396,7 @@ public class TaskQueueViewModel : Screen
             {
                 TaskItemViewModels.RemoveAt(index);
                 AddLog(string.Format(LocalizationHelper.GetString("TaskDeleted"), taskItem.Name), UiLogColor.Info);
+                AchievementTrackerHelper.Instance.Unlock(AchievementIds.QueueSimplifier);
             }
         }
     }

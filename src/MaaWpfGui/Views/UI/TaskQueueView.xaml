@@ -412,7 +412,7 @@
                         IsEnabled="{c:Binding 'Inited and !TaskSettingVisibilities.Guide'}"
                         Visibility="{c:Binding '!Inited or (Idle and !Stopping)'}">
                         <Button.Style>
-                            <Style BasedOn="{StaticResource ButtonBaseStyle}" TargetType="Button">
+                            <Style BasedOn="{StaticResource MaaButtonDefaultStyle}" TargetType="Button">
                                 <Setter Property="hc:IconElement.Geometry" Value="{x:Null}" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding ShowDeepSleepIcon}" Value="True">

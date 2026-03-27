@@ -515,6 +515,15 @@ public class ToolboxViewModel : Screen
     private bool _depotCacheInvalid = true;
     private string? _cachedArkPlannerResult;
     private string? _cachedLoliconResult;
+    private readonly HashSet<int> _pendingDepotSyncTimeResetTaskIds = [];
+
+    public void MarkDepotRecognitionSyncTimeForReset(int taskId)
+    {
+        if (taskId > 0)
+        {
+            _pendingDepotSyncTimeResetTaskIds.Add(taskId);
+        }
+    }
 
     /// <summary>
     /// 标记仓库缓存失效
@@ -551,24 +560,15 @@ public class ToolboxViewModel : Screen
     private void SaveDepotDetails()
     {
         // 构建简化格式：{"itemId": count}
-        var depotData = new JObject();
-        foreach (var item in DepotResult)
-        {
-            if (item.Count >= 0)
-            {
-                depotData[item.Id] = item.Count;
-            }
-        }
-
         var details = new JObject {
             ["done"] = true,
-            ["data"] = depotData.ToString(Formatting.None),
+            ["data"] = JObject.FromObject(DepotResult.Where(item => item.Count >= 0).ToDictionary(item => item.Id, item => item.Count)),
         };
 
         // 保存同步时间为 UTC（如果有）
         if (LastDepotSyncTime.HasValue)
         {
-            details["syncTime"] = LastDepotSyncTime.Value.ToString("o"); // ISO 8601 格式
+            details["syncTime"] = LastDepotSyncTime.Value.ToLocalTime().ToString("o"); // ISO 8601 格式
         }
 
         JsonDataHelper.Set(JsonDataKey.DepotData, details);
@@ -668,12 +668,18 @@ public class ToolboxViewModel : Screen
     /// </summary>
     /// <param name="details">详细的 JSON 参数</param>
     /// <param name="updateSyncTime">是否更新同步时间为当前时间（从 Core 获取新数据时为 true，从本地加载时为 false）</param>
+    /// <param name="taskId">传入对应的任务 ID 以便在收到回调后重置识别状态</param>
     /// <returns>是否成功</returns>
-    public bool DepotParse(JObject? details, bool updateSyncTime = false)
+    public bool DepotParse(JObject? details, bool updateSyncTime = false, int taskId = 0)
     {
         if (details == null)
         {
             return false;
+        }
+
+        if (_pendingDepotSyncTimeResetTaskIds.Remove(taskId))
+        {
+            ResetDepotRecognitionState();
         }
 
         DepotResult.Clear();
@@ -681,13 +687,23 @@ public class ToolboxViewModel : Screen
         Dictionary<string, int> depotItems = [];
 
         // 尝试解析新格式
-        var dataStr = details["data"]?.ToString();
-        if (!string.IsNullOrEmpty(dataStr))
+        var dataToken = details["data"];
+        if (dataToken is JObject dataObj)
+        {
+            foreach (var prop in dataObj.Properties())
+            {
+                if (int.TryParse(prop.Value.ToString(), out var count))
+                {
+                    depotItems[prop.Name] = count;
+                }
+            }
+        }
+        else if (dataToken?.ToString() is string dataStr && !string.IsNullOrEmpty(dataStr)) // 旧版格式迁移
         {
             try
             {
-                var dataObj = JObject.Parse(dataStr);
-                foreach (var prop in dataObj.Properties())
+                var dataO = JObject.Parse(dataStr);
+                foreach (var prop in dataO.Properties())
                 {
                     if (int.TryParse(prop.Value.ToString(), out var count))
                     {
@@ -758,15 +774,14 @@ public class ToolboxViewModel : Screen
         if (updateSyncTime)
         {
             // 从 Core 获取新数据，更新为当前 UTC 时间
+            AchievementTrackerHelper.Instance.CheckResyncAfterDays(LastDepotSyncTime?.UtcDateTime, 7, AchievementIds.ResumeRecord);
             LastDepotSyncTime = DateTimeOffset.UtcNow;
         }
         else
         {
             // 从本地加载，读取保存的时间
             var syncTimeStr = details["syncTime"]?.ToString(Formatting.None)?.Trim('"');
-            if (!string.IsNullOrEmpty(syncTimeStr) &&
-                DateTimeOffset.TryParseExact(syncTimeStr, "O", null, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal,
-                out var lastDepotSyncTime))
+            if (!string.IsNullOrEmpty(syncTimeStr) && DateTimeOffset.TryParse(syncTimeStr, null, DateTimeStyles.AssumeUniversal, out var lastDepotSyncTime))
             {
                 LastDepotSyncTime = lastDepotSyncTime;
             }
@@ -803,11 +818,13 @@ public class ToolboxViewModel : Screen
         DepotInfo = LocalizationHelper.GetString("CopiedToClipboard");
     }
 
+    /*
     private void DepotClear()
     {
         DepotResult.Clear();
         InvalidateDepotCache();
     }
+    */
 
     // 需要排除的物品 ID（不统计到仓库）
     private static readonly HashSet<string> ExcludedItemIds =
@@ -927,7 +944,8 @@ public class ToolboxViewModel : Screen
     /// </summary>
     public void ResetDepotRecognitionState()
     {
-        DepotClear();
+        // DepotParse 方法已经处理了数据清除和缓存失效，这里不需要重复调用
+        // DepotClear();
         LastDepotSyncTime = null;
     }
 
@@ -1149,7 +1167,7 @@ public class ToolboxViewModel : Screen
 
         if (LastOperBoxSyncTime.HasValue)
         {
-            data["syncTime"] = LastOperBoxSyncTime.Value.ToString("o");
+            data["syncTime"] = LastOperBoxSyncTime.Value.ToLocalTime().ToString("o");
         }
 
         JsonDataHelper.Set(JsonDataKey.OperBoxData, data);
@@ -1248,12 +1266,43 @@ public class ToolboxViewModel : Screen
     /// 每次传进来的都是完整数据, 临时缓存去重
     /// </summary>
     private HashSet<string> _tempOperHaveSet = [];
+    private readonly HashSet<int> _pendingOperBoxRecognitionResetTaskIds = [];
 
-    public bool OperBoxParse(JObject? details, bool updateSyncTime = true)
+    public void MarkOperBoxRecognitionDataForReset(int taskId)
+    {
+        if (taskId > 0)
+        {
+            _pendingOperBoxRecognitionResetTaskIds.Add(taskId);
+        }
+    }
+
+    private void ClearOperBoxRecognitionData()
+    {
+        OperBoxSelectedIndex = 1;
+        _operBoxPotential = null;
+        _tempOperHaveSet = [];
+        OperBoxHaveList = [];
+        OperBoxNotHaveList = [];
+        LastOperBoxSyncTime = null;
+    }
+
+    /// <summary>
+    /// 解析干员识别结果
+    /// </summary>
+    /// <param name="details">新增的干员数据</param>
+    /// <param name="updateSyncTime">是否更新同步时间（从 Core 获取新数据时为 true，从本地加载时为 false）</param>
+    /// <param name="taskId">传入对应的任务 ID 以便在收到回调后重置识别状态</param>
+    /// <returns>是否成功</returns>
+    public bool OperBoxParse(JObject? details, bool updateSyncTime = true, int taskId = 0)
     {
         if (details == null)
         {
             return false;
+        }
+
+        if (_pendingOperBoxRecognitionResetTaskIds.Remove(taskId))
+        {
+            ResetOperBoxRecognitionState();
         }
 
         var ownOpers = (details["own_opers"] as JArray)?.ToObject<List<OperBoxData.OperData>>()?.Where(o => !string.IsNullOrEmpty(o.Id)).ToList();
@@ -1299,13 +1348,13 @@ public class ToolboxViewModel : Screen
 
         if (updateSyncTime)
         {
+            AchievementTrackerHelper.Instance.CheckResyncAfterDays(LastOperBoxSyncTime?.UtcDateTime, 7, AchievementIds.ResumeRecord);
             LastOperBoxSyncTime = DateTimeOffset.UtcNow;
         }
         else
         {
             var syncTimeStr = details["syncTime"]?.ToString(Formatting.None)?.Trim('"');
-            if (!string.IsNullOrEmpty(syncTimeStr) &&
-                DateTimeOffset.TryParseExact(syncTimeStr, "O", null, DateTimeStyles.AssumeUniversal | DateTimeStyles.AdjustToUniversal, out var lastOperBoxSyncTime))
+            if (!string.IsNullOrEmpty(syncTimeStr) && DateTimeOffset.TryParse(syncTimeStr, null, DateTimeStyles.AssumeUniversal, out var lastOperBoxSyncTime))
             {
                 LastOperBoxSyncTime = lastOperBoxSyncTime;
             }
@@ -1322,11 +1371,7 @@ public class ToolboxViewModel : Screen
     /// </summary>
     public void ResetOperBoxRecognitionState()
     {
-        OperBoxSelectedIndex = 1;
-        _operBoxPotential = null;
-        _tempOperHaveSet = [];
-        OperBoxHaveList = [];
-        OperBoxNotHaveList = [];
+        ClearOperBoxRecognitionData();
         LastOperBoxSyncTime = null;
     }
 
@@ -1415,6 +1460,7 @@ public class ToolboxViewModel : Screen
         System.Windows.Forms.Clipboard.Clear();
         System.Windows.Forms.Clipboard.SetDataObject(JsonConvert.SerializeObject(exportList, Formatting.Indented));
         OperBoxInfo = LocalizationHelper.GetString("CopiedToClipboard");
+        AchievementTrackerHelper.Instance.Unlock(AchievementIds.OperatorRoster);
     }
 
     #endregion OperBox
@@ -1950,6 +1996,10 @@ public class ToolboxViewModel : Screen
         if (!caught)
         {
             _runningState.SetIdle(true);
+        }
+        else
+        {
+            AchievementTrackerHelper.Instance.Unlock(AchievementIds.SlackingOff);
         }
     }
 

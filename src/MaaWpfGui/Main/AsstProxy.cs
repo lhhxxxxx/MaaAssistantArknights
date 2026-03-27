@@ -1788,14 +1788,15 @@ public class AsstProxy
         }
 
         var subTaskDetails = details["details"];
+        AsstTaskId taskId = details["taskid"]?.ToObject<AsstTaskId>() ?? 0;
         switch (taskChain)
         {
             case "Depot":
-                Instances.ToolboxViewModel.DepotParse((JObject?)subTaskDetails, updateSyncTime: true);
+                Instances.ToolboxViewModel.DepotParse((JObject?)subTaskDetails, updateSyncTime: true, taskId);
                 break;
 
             case "OperBox":
-                Instances.ToolboxViewModel.OperBoxParse((JObject?)subTaskDetails, updateSyncTime: true);
+                Instances.ToolboxViewModel.OperBoxParse((JObject?)subTaskDetails, updateSyncTime: true, taskId);
                 break;
         }
 
