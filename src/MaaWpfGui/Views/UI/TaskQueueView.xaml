@@ -176,6 +176,8 @@
 
                                                                 <TextBlock FontWeight="SemiBold" Text="{DynamicResource RightClick}" />
                                                                 <TextBlock>
+                                                                    <Run Text="{DynamicResource RunTaskOnce}" />
+                                                                    <Run Text=" / " />
                                                                     <Run Text="{DynamicResource Rename}" />
                                                                     <Run Text=" / " />
                                                                     <Run Text="{DynamicResource Delete}" />
@@ -185,6 +187,11 @@
                                                     </RadioButton.ToolTip>
                                                     <RadioButton.ContextMenu>
                                                         <ContextMenu Width="150">
+                                                            <MenuItem
+                                                                Command="{s:Action RunTaskOnce,
+                                                                                   Target={x:Static helper:Instances.TaskQueueViewModel}}"
+                                                                CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                Header="{DynamicResource RunTaskOnce}" />
                                                             <MenuItem
                                                                 Command="{s:Action RenameTask,
                                                                                    Target={x:Static helper:Instances.TaskQueueViewModel}}"
