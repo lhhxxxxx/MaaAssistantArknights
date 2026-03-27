@@ -1,0 +1,38 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:hc="https://handyorg.github.io/handycontrol">
+
+    <Style x:Key="SegmentedSelectorBorderStyle" TargetType="{x:Type Border}">
+        <Setter Property="Padding" Value="2" />
+        <Setter Property="Background" Value="{DynamicResource MouseOverRegionBrushOpacity75}" />
+        <Setter Property="CornerRadius" Value="4" />
+    </Style>
+
+    <Style x:Key="SegmentedSelectorPanelStyle" TargetType="{x:Type WrapPanel}">
+        <Setter Property="HorizontalAlignment" Value="Center" />
+    </Style>
+
+    <Style
+        x:Key="SegmentedSelectorRadioButtonStyle"
+        BasedOn="{StaticResource RadioGroupItemSingle}"
+        TargetType="{x:Type RadioButton}">
+        <Setter Property="hc:VisualElement.HighlightBackground" Value="{DynamicResource RegionBrush}" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Style.Triggers>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="False" />
+                    <Condition Property="IsMouseOver" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="Transparent" />
+            </MultiTrigger>
+            <MultiTrigger>
+                <MultiTrigger.Conditions>
+                    <Condition Property="IsChecked" Value="False" />
+                    <Condition Property="IsPressed" Value="True" />
+                </MultiTrigger.Conditions>
+                <Setter Property="Background" Value="Transparent" />
+            </MultiTrigger>
+        </Style.Triggers>
+    </Style>
+
+</ResourceDictionary>
