@@ -2,7 +2,7 @@
 
 ### 正式接入 DeepSleep | Highlight
 
-从 v6.7.0 开始，MAA 正式接入 DeepSleep。
+我们很高兴地宣布：从 v6.7.0 开始，MAA 将正式接入 DeepSleep。这将意味着我们首次将 AI 引入到游戏助手领域，为你带来更智能、高效的体验。DeepSleep 的 AI 算法能够实时分析游戏运行数据，动态生成运行日志，在保证游戏流畅度的同时有效提升用户体验。这一功能的加入，标志着 MAA 在智能化方向上迈出了关键一步，未来我们也将持续探索 AI 技术与 MAA 的深度融合，为你带来更多创新体验。 ~（绝对不是牛牛喝醉了睡着导致的）~
 
 #### 成就 DLC #3 同步上线
 
@@ -22,7 +22,7 @@
 
 ----
 
-Starting with v6.7.0, MAA officially introduces DeepSleep.
+We are pleased to announce that starting from v6.7.0, MAA will officially integrate DeepSleep. This marks the first time we bring AI into the game assistant space, delivering a smarter and more efficient experience. DeepSleep's AI algorithm analyzes game runtime data in real time and dynamically generates operation logs, effectively enhancing user experience while maintaining smooth gameplay. The addition of this feature represents a key milestone in MAA's journey toward intelligence, and we will continue to explore deeper integration of AI technology with MAA to bring you more innovative experiences. ~(Definitely not because Pallas got drunk and fell asleep)~
 
 #### Achievement DLC #3 Included
 
