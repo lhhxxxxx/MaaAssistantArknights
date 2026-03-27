@@ -476,8 +476,7 @@
                         <StackPanel
                             Margin="2.5,5"
                             IsEnabled="{c:Binding 'CopilotTabIndex == 0 or CopilotTabIndex == 2'}"
-                            Orientation="Horizontal"
-                            Visibility="{c:Binding 'CopilotTabIndex != 1'}">
+                            Orientation="Horizontal">
                             <CheckBox Content="{DynamicResource UseCopilotList}" IsChecked="{Binding UseCopilotList}" />
                             <controls:TooltipBlock TooltipText="{DynamicResource UseCopilotListTip}" />
                         </StackPanel>

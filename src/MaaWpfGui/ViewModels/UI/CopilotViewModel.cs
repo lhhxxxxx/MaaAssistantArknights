@@ -1208,9 +1208,6 @@ public partial class CopilotViewModel : Screen
         if (!writeToCache)
         {// 现在是暂时将所有本地作业不添加到列表
         }
-        else if (CopilotTabIndex is 1)
-        { // 保全 不使用多作业列表
-        }
         else if (copilotList)
         {
             switch (copilot.Difficulty)
@@ -1288,11 +1285,7 @@ public partial class CopilotViewModel : Screen
             }
         }
 
-        if (UseCopilotList)
-        {
-            await AddSSSCopilotTaskToList(copilot, CopilotId);
-        }
-
+        await AddSSSCopilotTaskToList(copilot, CopilotId);
         return true;
     }
 
@@ -1370,6 +1363,8 @@ public partial class CopilotViewModel : Screen
                 await AddSSSCopilotTaskToList(sss, copilotId);
             }
         }
+
+        UseCopilotList = CopilotTabIndex is 0 or 2;
 
         Log(copilotSet.Name, copilotSet.Description);
         _copilotCache = null;
