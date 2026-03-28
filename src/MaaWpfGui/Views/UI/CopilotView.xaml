@@ -41,38 +41,26 @@
                 <Border Style="{StaticResource SegmentedSelectorBorderStyle}">
                     <WrapPanel IsEnabled="{Binding Idle}" Style="{StaticResource SegmentedSelectorPanelStyle}">
                         <RadioButton
-                            Command="{s:Action SelectCopilotTab}"
-                            CommandParameter="0"
                             GroupName="CopilotTabs"
-                            IsChecked="{c:Binding 'CopilotTabIndex == 0',
-                                                  Mode=OneWay}"
+                            IsChecked="{Binding IsMainCopilotTabSelected}"
                             Style="{StaticResource SegmentedSelectorRadioButtonStyle}">
                             <TextBlock Text="{DynamicResource MainStageStoryCollectionSideStory}" />
                         </RadioButton>
                         <RadioButton
-                            Command="{s:Action SelectCopilotTab}"
-                            CommandParameter="1"
                             GroupName="CopilotTabs"
-                            IsChecked="{c:Binding 'CopilotTabIndex == 1',
-                                                  Mode=OneWay}"
+                            IsChecked="{Binding IsSssCopilotTabSelected}"
                             Style="{StaticResource SegmentedSelectorRadioButtonStyle}">
                             <TextBlock Text="{DynamicResource SSS}" />
                         </RadioButton>
                         <RadioButton
-                            Command="{s:Action SelectCopilotTab}"
-                            CommandParameter="2"
                             GroupName="CopilotTabs"
-                            IsChecked="{c:Binding 'CopilotTabIndex == 2',
-                                                  Mode=OneWay}"
+                            IsChecked="{Binding IsParadoxCopilotTabSelected}"
                             Style="{StaticResource SegmentedSelectorRadioButtonStyle}">
                             <TextBlock Text="{DynamicResource ParadoxSimulation}" />
                         </RadioButton>
                         <RadioButton
-                            Command="{s:Action SelectCopilotTab}"
-                            CommandParameter="3"
                             GroupName="CopilotTabs"
-                            IsChecked="{c:Binding 'CopilotTabIndex == 3',
-                                                  Mode=OneWay}"
+                            IsChecked="{Binding IsActivityCopilotTabSelected}"
                             Style="{StaticResource SegmentedSelectorRadioButtonStyle}">
                             <TextBlock Text="{DynamicResource OtherActivityStage}" />
                         </RadioButton>
