@@ -127,7 +127,7 @@ Currently supported stages for navigation include:
   - Chernobog: Chernobog@Annihilation
   - Lungmen Outskirts: LungmenOutskirts@Annihilation
   - Lungmen Downtown: LungmenDowntown@Annihilation
-- OF-1 / OF-F3 / GT-5 in side stories.
+- OF-1 / OF-F3 in side stories.
 - Last three stages of current SS events. Visit [API](https://api.maa.plus/MaaAssistantArknights/api/gui/StageActivityV2.json) for the list of supported stages. Requires additional loading of event stage navigation in [tasks.json](https://api.maa.plus/MaaAssistantArknights/api/resource/tasks.json) file.
 - Rerun SS events. Input `SSReopen-<stage prefix>` to farm XX-1 ~ XX-9 stages at once, e.g. `SSReopen-IC`.
   :::  
