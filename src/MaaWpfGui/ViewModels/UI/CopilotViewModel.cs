@@ -249,51 +249,11 @@ public partial class CopilotViewModel : Screen
         }
     }
 
-    [PropertyDependsOn(nameof(CopilotTabIndex))]
-    public bool IsMainCopilotTabSelected
+    public void SelectCopilotTab(string tab)
     {
-        get => CopilotTabIndex == 0;
-        set {
-            if (value)
-            {
-                CopilotTabIndex = 0;
-            }
-        }
-    }
-
-    [PropertyDependsOn(nameof(CopilotTabIndex))]
-    public bool IsSssCopilotTabSelected
-    {
-        get => CopilotTabIndex == 1;
-        set {
-            if (value)
-            {
-                CopilotTabIndex = 1;
-            }
-        }
-    }
-
-    [PropertyDependsOn(nameof(CopilotTabIndex))]
-    public bool IsParadoxCopilotTabSelected
-    {
-        get => CopilotTabIndex == 2;
-        set {
-            if (value)
-            {
-                CopilotTabIndex = 2;
-            }
-        }
-    }
-
-    [PropertyDependsOn(nameof(CopilotTabIndex))]
-    public bool IsActivityCopilotTabSelected
-    {
-        get => CopilotTabIndex == 3;
-        set {
-            if (value)
-            {
-                CopilotTabIndex = 3;
-            }
+        if (int.TryParse(tab, out int tabIndex))
+        {
+            CopilotTabIndex = tabIndex;
         }
     }
 
