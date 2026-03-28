@@ -44,6 +44,7 @@ using Stylet;
 using static MaaWpfGui.Helper.CopilotHelper;
 using static MaaWpfGui.Helper.PathsHelper;
 using static MaaWpfGui.Models.AsstTasks.AsstCopilotTask;
+using static Microsoft.WindowsAPICodePack.Shell.PropertySystem.SystemProperties.System;
 using DataFormats = System.Windows.Forms.DataFormats;
 using Task = System.Threading.Tasks.Task;
 
@@ -245,54 +246,6 @@ public partial class CopilotViewModel : Screen
             if (!SetAndNotify(ref _copilotTabIndex, value))
             {
                 return;
-            }
-        }
-    }
-
-    [PropertyDependsOn(nameof(CopilotTabIndex))]
-    public bool IsMainCopilotTabSelected
-    {
-        get => CopilotTabIndex == 0;
-        set {
-            if (value)
-            {
-                CopilotTabIndex = 0;
-            }
-        }
-    }
-
-    [PropertyDependsOn(nameof(CopilotTabIndex))]
-    public bool IsSssCopilotTabSelected
-    {
-        get => CopilotTabIndex == 1;
-        set {
-            if (value)
-            {
-                CopilotTabIndex = 1;
-            }
-        }
-    }
-
-    [PropertyDependsOn(nameof(CopilotTabIndex))]
-    public bool IsParadoxCopilotTabSelected
-    {
-        get => CopilotTabIndex == 2;
-        set {
-            if (value)
-            {
-                CopilotTabIndex = 2;
-            }
-        }
-    }
-
-    [PropertyDependsOn(nameof(CopilotTabIndex))]
-    public bool IsActivityCopilotTabSelected
-    {
-        get => CopilotTabIndex == 3;
-        set {
-            if (value)
-            {
-                CopilotTabIndex = 3;
             }
         }
     }
