@@ -698,8 +698,8 @@ public class ToolboxViewModel : Screen
                 }
             }
         }
-        else if (dataToken?.ToString() is string dataStr && !string.IsNullOrEmpty(dataStr)) // 旧版格式迁移
-        {
+        else if (dataToken?.ToString() is string dataStr && !string.IsNullOrEmpty(dataStr))
+        { // 旧版格式迁移
             try
             {
                 var dataO = JObject.Parse(dataStr);

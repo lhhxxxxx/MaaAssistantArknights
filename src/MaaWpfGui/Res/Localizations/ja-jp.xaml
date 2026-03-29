@@ -101,7 +101,7 @@
     <system:String x:Key="OftenUsedGuide">↓ よく使われる</system:String>
     <system:String x:Key="SometimesUsedGuide">あまり使われていない ↑</system:String>
     <system:String x:Key="LinkStartGuide">← タスクを開始</system:String>
-    <system:String x:Key="RightClickRenameDelete">↓ 右クリックで名前変更/削除</system:String>
+    <system:String x:Key="RightClickRenameDelete">↓ 右クリックで1回実行/名前変更/削除</system:String>
     <system:String x:Key="UserGuide">使用ガイド</system:String>
     <system:String x:Key="GuideDocumentationTitle">📖 公式サイトとドキュメント</system:String>
     <system:String x:Key="GuideDocumentationPath">MAA の公式サイトと完全なドキュメントは「{key=Settings} - {key=AboutUs} - {key=Website}」でご覧いただけます。</system:String>
@@ -1000,6 +1000,7 @@ C:\\leidian\\LDPlayer9
     <system:String x:Key="CopilotClearTask" xml:space="preserve">左クリックですべてのタスクをクリア
 右クリックで非アクティブなタスクをクリア</system:String>
     <system:String x:Key="Start">開始</system:String>
+    <system:String x:Key="RunTaskOnce">1回実行</system:String>
     <system:String x:Key="VideoLink">映像へのハイパーリンク</system:String>
     <system:String x:Key="CopilotFormationRequirement.Level">昇進{0} レベル{1}</system:String>
     <system:String x:Key="CopilotSkill">スキル</system:String>

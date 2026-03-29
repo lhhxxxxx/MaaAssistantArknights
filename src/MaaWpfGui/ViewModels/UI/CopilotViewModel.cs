@@ -1202,14 +1202,15 @@ public partial class CopilotViewModel : Screen
             if (GetCopilotType(stageId) is CopilotType type and not CopilotType.Unknown)
             {
                 CopilotTabIndex = (int)type;
+                if (copilotList)
+                {
+                    UseCopilotList = CopilotTabIndex is 0 or 2;
+                }
             }
         }
 
         if (!writeToCache)
         {// 现在是暂时将所有本地作业不添加到列表
-        }
-        else if (CopilotTabIndex is 1)
-        { // 保全 不使用多作业列表
         }
         else if (copilotList)
         {
@@ -1288,11 +1289,7 @@ public partial class CopilotViewModel : Screen
             }
         }
 
-        if (UseCopilotList)
-        {
-            await AddSSSCopilotTaskToList(copilot, CopilotId);
-        }
-
+        await AddSSSCopilotTaskToList(copilot, CopilotId);
         return true;
     }
 

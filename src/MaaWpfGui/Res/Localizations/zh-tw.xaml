@@ -101,7 +101,7 @@
     <system:String x:Key="OftenUsedGuide">↓ 常用的</system:String>
     <system:String x:Key="SometimesUsedGuide">不常用的 ↑</system:String>
     <system:String x:Key="LinkStartGuide">← 開始任務</system:String>
-    <system:String x:Key="RightClickRenameDelete">↓ 右鍵重新命名/刪除</system:String>
+    <system:String x:Key="RightClickRenameDelete">↓ 右鍵單次執行/重新命名/刪除</system:String>
     <system:String x:Key="UserGuide">使用指引</system:String>
     <system:String x:Key="GuideDocumentationTitle">📖 官網與文件</system:String>
     <system:String x:Key="GuideDocumentationPath">您可以在「{key=Settings} - {key=AboutUs} - {key=Website}」找到 MAA 的官方網站和完整文件。</system:String>
@@ -1000,6 +1000,7 @@ C:\\leidian\\LDPlayer9\n
 右鍵清除未啟用任務</system:String>
     <system:String x:Key="LoopTimes">循環次數</system:String>
     <system:String x:Key="Start">開始</system:String>
+    <system:String x:Key="RunTaskOnce">單次執行</system:String>
     <system:String x:Key="VideoLink">影片連結</system:String>
     <system:String x:Key="CopilotFormationRequirement.Level">精{0} {1}</system:String>
     <system:String x:Key="CopilotSkill">技能</system:String>

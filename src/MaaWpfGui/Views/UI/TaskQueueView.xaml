@@ -176,6 +176,8 @@
 
                                                                 <TextBlock FontWeight="SemiBold" Text="{DynamicResource RightClick}" />
                                                                 <TextBlock>
+                                                                    <Run Text="{DynamicResource RunTaskOnce}" />
+                                                                    <Run Text=" / " />
                                                                     <Run Text="{DynamicResource Rename}" />
                                                                     <Run Text=" / " />
                                                                     <Run Text="{DynamicResource Delete}" />
@@ -185,6 +187,11 @@
                                                     </RadioButton.ToolTip>
                                                     <RadioButton.ContextMenu>
                                                         <ContextMenu Width="150">
+                                                            <MenuItem
+                                                                Command="{s:Action RunTaskOnce,
+                                                                                   Target={x:Static helper:Instances.TaskQueueViewModel}}"
+                                                                CommandParameter="{Binding PlacementTarget.DataContext, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                                                Header="{DynamicResource RunTaskOnce}" />
                                                             <MenuItem
                                                                 Command="{s:Action RenameTask,
                                                                                    Target={x:Static helper:Instances.TaskQueueViewModel}}"
@@ -233,7 +240,7 @@
                                 hc:IconElement.Geometry="{StaticResource TaskQueueAddTaskIcon}"
                                 Foreground="{DynamicResource PrimaryTextBrush}"
                                 IsEnabled="{Binding Idle}"
-                                Style="{StaticResource ButtonBaseStyle}">
+                                Style="{StaticResource MaaButtonDefaultStyle}">
                                 <hc:ContextMenuButton.Menu>
                                     <ContextMenu
                                         Width="200"
@@ -414,9 +421,11 @@
                         <Button.Style>
                             <Style BasedOn="{StaticResource MaaButtonDefaultStyle}" TargetType="Button">
                                 <Setter Property="hc:IconElement.Geometry" Value="{x:Null}" />
+                                <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding ShowDeepSleepIcon}" Value="True">
                                         <Setter Property="hc:IconElement.Geometry" Value="{StaticResource DeepSleep}" />
+                                        <Setter Property="Foreground" Value="{DynamicResource DeepSleepBrush}" />
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>

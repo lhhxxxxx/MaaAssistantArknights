@@ -101,7 +101,7 @@
     <system:String x:Key="OftenUsedGuide">↓ 자주 쓰는 설정</system:String>
     <system:String x:Key="SometimesUsedGuide">가끔 쓰는 설정 ↑</system:String>
     <system:String x:Key="LinkStartGuide">← 연결 및 동작 시작</system:String>
-    <system:String x:Key="RightClickRenameDelete">↓ 우클릭하여 이름 변경/삭제</system:String>
+    <system:String x:Key="RightClickRenameDelete">↓ 우클릭하여 1회 실행/이름 변경/삭제</system:String>
     <system:String x:Key="UserGuide">사용 가이드</system:String>
     <system:String x:Key="GuideDocumentationTitle">📖 공식 웹사이트 및 문서</system:String>
     <system:String x:Key="GuideDocumentationPath">"{key=Settings} - {key=AboutUs} - {key=Website}"에서 MAA의 공식 웹사이트와 전체 문서를 찾을 수 있습니다.</system:String>
@@ -1001,6 +1001,7 @@ C:\\leidian\\LDPlayer9
     <system:String x:Key="CopilotClearTask" xml:space="preserve">좌클릭으로 모든 작업 지우기
 우클릭으로 비활성 작업 지우기</system:String>
     <system:String x:Key="Start">시작</system:String>
+    <system:String x:Key="RunTaskOnce">1회 실행</system:String>
     <system:String x:Key="VideoLink">영상 링크</system:String>
     <system:String x:Key="CopilotFormationRequirement.Level">{0}차 정예화 Lv.{1}</system:String>
     <system:String x:Key="CopilotSkill">스킬</system:String>

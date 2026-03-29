@@ -1371,6 +1371,39 @@ public class TaskQueueViewModel : Screen
     }
 
     /// <summary>
+    /// 单次运行任务。
+    /// </summary>
+    /// <param name="taskItem">任务项</param>
+    /// <returns>A <see cref="Task"/>representing the asynchronous operation.</returns>
+    [UsedImplicitly]
+    public async Task RunTaskOnce(TaskItemViewModel taskItem)
+    {
+        if (taskItem == null || !Idle)
+        {
+            return;
+        }
+
+        if (taskItem.Index < 0 || taskItem.Index >= ConfigFactory.CurrentConfig.TaskQueue.Count)
+        {
+            return;
+        }
+
+        var task = ConfigFactory.CurrentConfig.TaskQueue[taskItem.Index];
+        var originalIsEnable = task.IsEnable;
+
+        try
+        {
+            // 单次运行应只受当前右键操作影响，不改变任务的持久启用状态。
+            task.IsEnable = true;
+            await LinkStartWithTasks([task]);
+        }
+        finally
+        {
+            task.IsEnable = originalIsEnable;
+        }
+    }
+
+    /// <summary>
     /// 删除任务
     /// </summary>
     /// <param name="taskItem">任务项</param>
