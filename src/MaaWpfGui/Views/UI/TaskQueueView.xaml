@@ -415,7 +415,6 @@
                         Height="50"
                         Margin="5"
                         Command="{s:Action LinkStart}"
-                        Content="{DynamicResource LinkStart}"
                         IsEnabled="{c:Binding 'Inited and !TaskSettingVisibilities.Guide'}"
                         Visibility="{c:Binding '!Inited or (Idle and !Stopping)'}">
                         <Button.Style>
@@ -430,6 +429,18 @@
                                 </Style.Triggers>
                             </Style>
                         </Button.Style>
+                        <controls:TextBlock Text="{DynamicResource LinkStart}">
+                            <controls:TextBlock.Style>
+                                <Style BasedOn="{StaticResource MaaTextBlockDefaultStyle}" TargetType="controls:TextBlock">
+                                    <Setter Property="Visibility" Value="Visible" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ShowDeepSleepIcon}" Value="True">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </controls:TextBlock.Style>
+                        </controls:TextBlock>
                     </Button>
                     <Button
                         Width="100"
