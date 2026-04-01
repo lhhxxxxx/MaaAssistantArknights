@@ -1368,7 +1368,12 @@
         "specificRect": [1260, 100, 10, 10],
         "maxTimes": 10,
         "postDelay": 3000,
-        "next": ["EndOfActionAnnihilation", "EndOfAction", "(ClickCorner + WaitAfterPRTS + StartUpThemes)#next ^ #self", "#self"],
+        "next": [
+            "EndOfActionAnnihilation",
+            "EndOfAction",
+            "(ClickCorner + WaitAfterPRTS + StartUpThemes)#next ^ #self",
+            "#self"
+        ],
         "exceededNext": ["RestartGameAndContinue"]
     },
     "EndOfAction": {
