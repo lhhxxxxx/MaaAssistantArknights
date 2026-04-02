@@ -2820,7 +2820,7 @@
         "template": "DormConfirm.png",
         "action": "ClickSelf",
         "roi": [630, 620, 650, 100],
-        "postDelay": 500,
+        "postDelay": 1000,
         "next": ["InfrastDormConfirmButtonWait", "InfrastDormDoubleConfirmButton", "Stop"]
     },
     "InfrastEnterFacility": {
