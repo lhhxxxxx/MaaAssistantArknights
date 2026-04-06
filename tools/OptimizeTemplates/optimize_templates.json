@@ -3945,5 +3945,13 @@
     "resource/template/items/emoticon_foolsday_doctor": "3edb210e3b73442df7201c5ddeeecfa66b1363d439525db4fec19503bffe0869",
     "resource/global/txwy/resource/template/UiTheme/AveMujica/GachaEnter": "ee138abad51eba96c014ae52c8834ebc044410566e917179839e6e273fd5f132",
     "resource/global/txwy/resource/template/UiTheme/AveMujica/Mall": "6ec951cc54d64d7941823140a981f70d01551e0c96059fbacd3f38d13775d8a1",
-    "resource/global/txwy/resource/template/UiTheme/AveMujica/Recruit": "88678620eeeb7dafa94a6fbbfa472469bb0fdbb4a80cbd101fdf2d497220dcec"
+    "resource/global/txwy/resource/template/UiTheme/AveMujica/Recruit": "88678620eeeb7dafa94a6fbbfa472469bb0fdbb4a80cbd101fdf2d497220dcec",
+    "resource/template/items/act51side_token_poem": "19baede3ff8aa114776af6b83ad62ef8eb2213f9c8681a9064c5d317ee4fae1f",
+    "resource/template/items/SINGLE_72_0_1_GACHA_10": "bf3b01032d5d7140032d54c87860b2d38a804641fe7f7ed1081d8c0cd009083c",
+    "resource/template/items/SINGLE_72_0_1_GACHA": "b6b5088b6448a54749ac17374d430e1e95994d90211d790adf82a74fa5826d8b",
+    "resource/template/infrast/Bskill_hire_spd&clue3": "bd09feaae1483ea340762382a48234b0c0ca4df693477f17c442a6d3b085cf99",
+    "resource/template/infrast/Bskill_ctrl_c_ussg": "e0fe844f38c4349ebdfabdddf0c38237b67682fdbe21daaba84477ddca8c13d8",
+    "resource/template/infrast/Bskill_hire_spd&clue4": "15dc319573c738fc08952d7536643c551426e4229a913d0b40081a8492cb5328",
+    "resource/template/infrast/Bskill_formula_spd_headb1": "89d7ae35f0f71ba0eef8cc98d447985441bca224408d35dfe8c533e862c06237",
+    "resource/template/infrast/Bskill_formula_spd_headb2": "2c170a0c0e1907c192ab8f3b39d86851f239de99fe4b03578b90035a9ee70fd2"
 }
