@@ -36,7 +36,7 @@
     "PA-OpenOcr": {
         "baseTask": "SS-OpenOcr",
         "postDelay": 3000,
-        "text": ["Unknown", "踏入新生黎明"],
+        "text": ["人们，我们", "踏入新生黎明"],
         "next": ["PAChapterToPA"]
     },
     "PAChapterToPA": {
