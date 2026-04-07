@@ -1017,7 +1017,13 @@
             ["Mantra", "真言"],
             ["Vetochki", "折桠"],
             ["Heavily Polluted Facility", "严重污染设施"],
-            ["Snegurochka", "冬时"]
+            ["Snegurochka", "冬时"],
+            ["Waterproof Supply Crate", "防水物资箱"],
+            ["Supplies Floater", "物资浮板"],
+            ["Gravity Floater", "引力浮板"],
+            ["Basic Floater", "基础浮板"],
+            ["Manual Booster", "全手动推进器"],
+            ["Illusion Reflector", "迷幻反射镜"]
         ]
     },
     "GameStartCheckResourceOCR": {

@@ -227,15 +227,15 @@ Whether to enable this task.
 Whether to refresh 3★ tags.  
 :::  
 ::: field name="select" type="array<number>" required  
-Tag levels to click.  
+Tag ★ rarity to click.  
 :::  
 ::: field name="confirm" type="array<number>" required  
-Tag levels for confirmation. Can be set to empty array for calculation only.  
+Tag ★ rarity for confirmation. Can be set to empty array for calculation only.  
 :::  
 ::: field name="first_tags" type="array<string>" optional  
-Preferred Tags, valid only if 3★ tags. By default empty.
+Preferred Tags, valid only when selecting 3★ tags. Default is empty.
 <br>
-When Tag is level-3, as many Tags here as possible (if any) will be selected, and it's a forced selection, i.e. it ignores all "unselect 3★ Tags" settings.  
+For 3★ recruits, MAA will try to include as many of the listed tags as possible. This is treated as a hard requirement and will override any "don't select 3★ Tags" settings.  
 :::  
 ::: field name="extra_tags_mode" type="number" optional default="0"  
 Select more tags.
@@ -262,7 +262,7 @@ Number of expedites, only effective when `expedite` is true. By default unlimite
 Whether to skip when robot tag is recognized.  
 :::  
 ::: field name="recruitment_time" type="object" optional  
-Tag level (greater than or equal to 3) and corresponding desired recruitment time limit, in minutes, all default to 540 (i.e. 09:00:00).
+Tag ★ rarity (greater than or equal to 3) and corresponding desired recruitment time limit, in minutes, all default to 540 (i.e. 09:00:00).
 <br>
 Example: `{ "3": 540, "4": 540 }`  
 :::  
