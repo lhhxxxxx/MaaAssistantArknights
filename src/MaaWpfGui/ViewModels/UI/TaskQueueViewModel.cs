@@ -464,7 +464,7 @@ public class TaskQueueViewModel : Screen
             await Task.Delay(1000);
         }
 
-        if (actions.ExitEmulator)
+        if (actions.ExitEmulator && !SettingsViewModel.ConnectSettings.UseAttachWindow)
         {
             DoKillEmulator();
             await Task.Delay(1000);
