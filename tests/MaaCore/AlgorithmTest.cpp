@@ -19,6 +19,12 @@ void require_valid_allocation(const GroupList& group_list, const CharSet& char_s
     REQUIRE(result.has_value());
     REQUIRE(result.allocation.size() == group_list.size());
 
+    for (const auto& [group_name, allocated_char] : result.allocation) {
+        INFO("group_name=" << group_name);
+        REQUIRE(group_list.contains(group_name));
+        REQUIRE(char_set.contains(allocated_char));
+    }
+
     std::unordered_set<std::string> used_chars;
     for (const auto& [group_name, candidates] : group_list) {
         INFO("group_name=" << group_name);
