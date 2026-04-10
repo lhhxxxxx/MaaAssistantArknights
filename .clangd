@@ -1,5 +1,14 @@
+If:
+  PathMatch: tests/.*\.(c|cc|cpp|cxx|h|hh|hpp)$
+CompileFlags:
+  CompilationDatabase: build/unit-tests
+  Add: [-Wunused-variables]
+---
+If:
+  PathExclude: tests/.*\.(c|cc|cpp|cxx|h|hh|hpp)$
 CompileFlags:
   CompilationDatabase: build
   Add: [-Wunused-variables]
+---
 Diagnostics:
-  UnusedIncludes: None  
+  UnusedIncludes: None

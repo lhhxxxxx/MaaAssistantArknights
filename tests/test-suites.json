@@ -1,0 +1,19 @@
+{
+  "runAllOnChanges": [
+    "tests/CMakeLists.txt",
+    "tests/test-suites.json",
+    ".github/workflows/unit-tests.yml"
+  ],
+  "suites": [
+    {
+      "id": "maa-algorithm-test",
+      "name": "Algorithm",
+      "buildTarget": "maa-algorithm-test",
+      "ctestRegex": "^algorithm::",
+      "paths": [
+        "src/MaaCore/Utils/Algorithm.hpp",
+        "tests/MaaCore/AlgorithmTest.cpp"
+      ]
+    }
+  ]
+}
