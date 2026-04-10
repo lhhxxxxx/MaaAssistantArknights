@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using JetBrains.Annotations;
 using MaaWpfGui.Configuration.Factory;
@@ -716,11 +717,12 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
     /// 啥都不选时，更新关卡列表，关卡选择为未开放的关卡时在关卡列表中添加对应未开放关卡，避免清空导致进入上次关卡
     /// 除手动输入外所有情况下，如果剩余理智为未开放的关卡，会被清空
     /// </summary>
+    /// <returns>更新任务列表的Task</returns>
     // FIXME: 被注入对象只能在private函数内使用，只有Model显示之后才会被注入。如果Model还没有触发OnInitialActivate时调用函数会NullPointerException
     // 这个函数被列为public可见，意味着他注入对象前被调用
-    public void UpdateStageList()
+    public Task UpdateStageList()
     {
-        Execute.PostToUIThreadAsync(() => {
+        return Execute.OnUIThreadAsync(() => {
             using var log = new LogScope(_logger);
             var stageList = Instances.StageManager.GetStageList();
             using var scope = TaskQueueViewModel.TaskQueueSerializingLock.EnterScope();

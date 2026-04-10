@@ -780,7 +780,7 @@ public class TaskQueueViewModel : Screen
         }
 
         _isUpdatingDatePrompt = true;
-        UpdateDatePromptAndStagesLocally();
+        UpdateDatePromptAndStagesLocally(true);
         Execute.OnUIThread(() => NotifyOfPropertyChange(nameof(ShowDeepSleepIcon)));
 
         var delayTime = CalculateRandomDelay();
@@ -1043,10 +1043,15 @@ public class TaskQueueViewModel : Screen
     /// <summary>
     /// 更新日期提示和关卡列表
     /// </summary>
-    public void UpdateDatePromptAndStagesLocally()
+    /// <param name="waitStageListUpdated">是否等待关卡列表更新完成</param>
+    public void UpdateDatePromptAndStagesLocally(bool waitStageListUpdated = false)
     {
         UpdateDatePrompt();
-        FightTask.UpdateStageList();
+        var task = FightTask.UpdateStageList();
+        if (waitStageListUpdated)
+        {
+            task.Wait();
+        }
         ToolboxViewModel.UpdateMiniGameTaskList();
     }
 
