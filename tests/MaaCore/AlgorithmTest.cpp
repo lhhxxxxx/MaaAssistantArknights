@@ -5,7 +5,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include "src/MaaCore/Utils/Algorithm.hpp"
+#include "Utils/Algorithm.hpp"
 
 namespace
 {
