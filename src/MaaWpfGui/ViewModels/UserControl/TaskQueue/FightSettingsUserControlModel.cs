@@ -79,8 +79,8 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
 
     private static readonly Dictionary<string, string> _stageDictionary = new()
         {
-            { "AN", "Annihilation" },
-            { "剿灭", "Annihilation" },
+            { "AN", AnnihilationName },
+            { "剿灭", AnnihilationName },
             { "CE", "CE-6" },
             { "龙门币", "CE-6" },
             { "LS", "LS-6" },
@@ -468,7 +468,7 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
 
     public static Dictionary<string, string> AnnihilationModeList { get; } = new()
     {
-        { LocalizationHelper.GetString("Annihilation.Current"), "Annihilation" },
+        { LocalizationHelper.GetString("Annihilation.Current"), AnnihilationName },
         { LocalizationHelper.GetString("Chernobog"), "Chernobog@Annihilation" },
         { LocalizationHelper.GetString("LungmenOutskirts"), "LungmenOutskirts@Annihilation" },
         { LocalizationHelper.GetString("LungmenDowntown"), "LungmenDowntown@Annihilation" },
@@ -481,7 +481,7 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
             bool ret = SetTaskConfig<FightTask>(t => t.UseCustomAnnihilation == value, t => t.UseCustomAnnihilation = value);
             if (ret)
             {
-                StageListSource.FirstOrDefault(i => i.Value == "Annihilation")?.Display = UseCustomAnnihilation ? (AnnihilationModeList.FirstOrDefault(i => i.Value == AnnihilationStage).Key ?? LocalizationHelper.GetString("Annihilation.Current")) : LocalizationHelper.GetString("Annihilation.Current");
+                StageListSource.FirstOrDefault(i => i.Value == AnnihilationName)?.Display = UseCustomAnnihilation ? (AnnihilationModeList.FirstOrDefault(i => i.Value == AnnihilationStage).Key ?? LocalizationHelper.GetString("Annihilation.Current")) : LocalizationHelper.GetString("Annihilation.Current");
             }
         }
     }
@@ -491,7 +491,7 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
         get => GetTaskConfig<FightTask>().AnnihilationStage;
         set {
             SetTaskConfig<FightTask>(t => t.AnnihilationStage == value, t => t.AnnihilationStage = value);
-            StageListSource.FirstOrDefault(i => i.Value == "Annihilation")?.Display = UseCustomAnnihilation ? (AnnihilationModeList.FirstOrDefault(i => i.Value == value).Key ?? LocalizationHelper.GetString("Annihilation.Current")) : LocalizationHelper.GetString("Annihilation.Current");
+            StageListSource.FirstOrDefault(i => i.Value == AnnihilationName)?.Display = UseCustomAnnihilation ? (AnnihilationModeList.FirstOrDefault(i => i.Value == value).Key ?? LocalizationHelper.GetString("Annihilation.Current")) : LocalizationHelper.GetString("Annihilation.Current");
         }
     }
 
@@ -782,7 +782,7 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
         {
             listSource.Add(new StageSourceItem() { Display = item, Value = item, IsOpen = false, IsVisible = false, IsOutdated = true });
         }
-        listSource.FirstOrDefault(i => i.Value == "Annihilation")?.Display = current.UseCustomAnnihilation ? (AnnihilationModeList.FirstOrDefault(i => i.Value == current.AnnihilationStage).Key ?? LocalizationHelper.GetString("Annihilation.Current")) : LocalizationHelper.GetString("Annihilation.Current");
+        listSource.FirstOrDefault(i => i.Value == AnnihilationName)?.Display = current.UseCustomAnnihilation ? (AnnihilationModeList.FirstOrDefault(i => i.Value == current.AnnihilationStage).Key ?? LocalizationHelper.GetString("Annihilation.Current")) : LocalizationHelper.GetString("Annihilation.Current");
         StageListSource = [.. listSource];
         current.StagePlan = listCurrent; // StageListSource更新后, 恢复StagePlan
     }
@@ -938,7 +938,7 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
             Instance.IsRefreshingUI = true;
         }
 
-        void IDisposable.Dispose()
+        readonly void IDisposable.Dispose()
         {
             --_depth;
             if (_depth == 0)
@@ -983,7 +983,7 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
                 ClientType = SettingsViewModel.GameSettings.ClientType,
             };
 
-            if (task.Stage == "Annihilation" && fight.UseCustomAnnihilation)
+            if (task.Stage == AnnihilationName && fight.UseCustomAnnihilation)
             {
                 task.Stage = fight.AnnihilationStage;
             }
