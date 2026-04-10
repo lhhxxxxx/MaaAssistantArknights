@@ -722,10 +722,10 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
     // 这个函数被列为public可见，意味着他注入对象前被调用
     public Task UpdateStageList()
     {
-        return Execute.OnUIThreadAsync(() => {
+        return Execute.OnUIThreadAsync(async () => {
             using var log = new LogScope(_logger);
             var stageList = Instances.StageManager.GetStageList();
-            using var scope = TaskQueueViewModel.TaskQueueSerializingLock.EnterScope();
+            await TaskQueueViewModel.TaskQueueSerializingLock.WaitAsync();
             using (var refresh = new UiRefreshingScope())
             {
                 RefreshStageList();
@@ -752,6 +752,7 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
                 }
                 RefreshCurrentStagePlan();
             }
+            TaskQueueViewModel.TaskQueueSerializingLock.Release();
 
             foreach (var (item, index) in Instances.TaskQueueViewModel.TaskItemViewModels.Select((i, index) => (i, index)))
             {

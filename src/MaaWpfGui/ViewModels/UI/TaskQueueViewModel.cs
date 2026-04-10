@@ -65,7 +65,7 @@ public class TaskQueueViewModel : Screen
 
     private static readonly ILogger _logger = Log.ForContext<TaskQueueViewModel>();
 
-    public static Lock TaskQueueSerializingLock { get; } = new();
+    public static SemaphoreSlim TaskQueueSerializingLock { get; } = new(1, 1);
 
     /// <summary>
     /// Gets or private sets the view models of task items.
@@ -1724,8 +1724,9 @@ public class TaskQueueViewModel : Screen
     public async Task LinkStart()
     {
         using var log = new LogScope(_logger);
-        using var @lock = TaskQueueSerializingLock.EnterScope();
+        await TaskQueueSerializingLock.WaitAsync();
         await LinkStartWithTasks(ConfigFactory.CurrentConfig.TaskQueue);
+        TaskQueueSerializingLock.Release();
     }
 
     public async Task LinkStartWithTasks(IEnumerable<BaseTask> tasks)
