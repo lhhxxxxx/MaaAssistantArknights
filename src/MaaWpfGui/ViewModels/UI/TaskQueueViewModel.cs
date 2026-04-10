@@ -65,6 +65,8 @@ public class TaskQueueViewModel : Screen
 
     private static readonly ILogger _logger = Log.ForContext<TaskQueueViewModel>();
 
+    public static Lock TaskQueueSerializingLock { get; } = new();
+
     /// <summary>
     /// Gets or private sets the view models of task items.
     /// </summary>
@@ -295,8 +297,7 @@ public class TaskQueueViewModel : Screen
 
         if (isAprilFools)
         {
-            Execute.OnUIThread(async () =>
-            {
+            Execute.OnUIThread(async () => {
                 await Task.Delay(_logRandom.Next(800, 1500));
                 log.Content = string.Empty;
                 foreach (var ch in content)
@@ -1717,6 +1718,8 @@ public class TaskQueueViewModel : Screen
     /// <returns>Task</returns>
     public async Task LinkStart()
     {
+        using var log = new LogScope(_logger);
+        using var @lock = TaskQueueSerializingLock.EnterScope();
         await LinkStartWithTasks(ConfigFactory.CurrentConfig.TaskQueue);
     }
 

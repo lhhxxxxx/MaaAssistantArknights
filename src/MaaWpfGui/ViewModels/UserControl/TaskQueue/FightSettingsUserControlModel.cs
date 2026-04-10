@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Threading;
 using System.Windows;
 using JetBrains.Annotations;
 using MaaWpfGui.Configuration.Factory;
@@ -43,7 +42,6 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
 {
     public const string AnnihilationName = "Annihilation";
     private static readonly ILogger _logger = Log.ForContext<FightSettingsUserControlModel>();
-    private static readonly Lock _lock = new();
 
     public static FightTimes? FightReport { get; set; }
 
@@ -627,7 +625,7 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
         }
     }
 
-    public ObservableCollection<WeeklyScheduleItem> WeeklyScheduleSource { get; set; } = new(Enum.GetValues<DayOfWeek>().Select(i => new WeeklyScheduleItem(i)));
+    public ObservableCollection<WeeklyScheduleItem> WeeklyScheduleSource { get; set; } = [.. Enum.GetValues<DayOfWeek>().Select(i => new WeeklyScheduleItem(i))];
 
     public bool AutoRestartOnDrop
     {
@@ -680,7 +678,7 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
         {
             return;
         }
-        IsRefreshingUI = true;
+        using var refresh = new UiRefreshingScope();
         if (!UseAlternateStage && fight.StagePlan.Count == 0)
         {
             fight.StagePlan.Add(string.Empty);
@@ -690,7 +688,6 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
         RefreshWeeklySchedule();
         RefreshDropName();
         Refresh();
-        IsRefreshingUI = false;
     }
 
     private bool? SetFightParams()
@@ -725,31 +722,45 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
     {
         Execute.PostToUIThreadAsync(() => {
             using var log = new LogScope(_logger);
-            using var scope = _lock.EnterScope();
             var stageList = Instances.StageManager.GetStageList();
-            RefreshStageList();
-            foreach (var task in ConfigFactory.CurrentConfig.TaskQueue.OfType<FightTask>().Where(i => !i.IsStageManually))
+            using var scope = TaskQueueViewModel.TaskQueueSerializingLock.EnterScope();
+            using (var refresh = new UiRefreshingScope())
             {
-                var originalPlan = task.StagePlan.ToList();
-                bool reset = false;
-                for (int i = 0; i < task.StagePlan.Count; i++)
+                RefreshStageList();
+                foreach (var task in ConfigFactory.CurrentConfig.TaskQueue.OfType<FightTask>().Where(i => !i.IsStageManually))
                 {
-                    var stage = task.StagePlan[i];
-                    if (!stageList.Any(p => p.Value == stage))
+                    var originalPlan = task.StagePlan.ToList();
+                    bool reset = false;
+                    for (int i = 0; i < task.StagePlan.Count; i++)
                     {
-                        reset = true;
-                        if (task.StageResetMode == FightStageResetMode.Current)
+                        var stage = task.StagePlan[i];
+                        if (!stageList.Any(p => p.Value == stage))
                         {
-                            task.StagePlan[i] = string.Empty;
+                            reset = true;
+                            if (task.StageResetMode == FightStageResetMode.Current)
+                            {
+                                task.StagePlan[i] = string.Empty;
+                            }
                         }
                     }
+                    if (reset)
+                    {
+                        _logger.Information("Reset non-existing stage: {} to {}", string.Join(", ", originalPlan), string.Join(", ", task.StagePlan));
+                    }
                 }
-                if (reset)
+                RefreshCurrentStagePlan();
+            }
+
+            foreach (var (item, index) in Instances.TaskQueueViewModel.TaskItemViewModels.Select((i, index) => (i, index)))
+            {
+                if (ConfigFactory.Root.CurrentConfig.TaskQueue[index] is FightTask fight && item.TaskIds.Count == 1 && Instances.AsstProxy.TasksStatus.ContainsKey(item.TaskIds[0]))
                 {
-                    _logger.Information("Reset non-existing stage: {} to {}", string.Join(", ", originalPlan), string.Join(", ", task.StagePlan));
+                    if (SerializeTask(fight, Instances.TaskQueueViewModel.TaskItemViewModels[index].TaskIds[0]).IsSuccess is not true)
+                    {
+                        _logger.Warning("Failed to serialize task {taskId} when updating stage list", item.TaskIds[0]);
+                    }
                 }
             }
-            RefreshCurrentStagePlan();
         });
     }
 
@@ -770,7 +781,7 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
             listSource.Add(new StageSourceItem() { Display = item, Value = item, IsOpen = false, IsVisible = false, IsOutdated = true });
         }
         listSource.FirstOrDefault(i => i.Value == "Annihilation")?.Display = current.UseCustomAnnihilation ? (AnnihilationModeList.FirstOrDefault(i => i.Value == current.AnnihilationStage).Key ?? LocalizationHelper.GetString("Annihilation.Current")) : LocalizationHelper.GetString("Annihilation.Current");
-        StageListSource = new ObservableCollection<StageSourceItem>(listSource);
+        StageListSource = [.. listSource];
         current.StagePlan = listCurrent; // StageListSource更新后, 恢复StagePlan
     }
 
@@ -786,7 +797,7 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
         {
             item.PropertyChanged += (_, __) => SaveStagePlan();
         }
-        StagePlan = new ObservableCollection<StagePlanItem>(list);
+        StagePlan = [.. list];
         StagePlan.CollectionChanged += (_, __) => SaveStagePlan();
         SetFightParams(); // 恢复StagePlan后, 修复AsstFightTask的Stage
     }
@@ -915,6 +926,26 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
         public bool IsOpen { get => field; set => SetAndNotify(ref field, value); } = Instances.TaskQueueViewModel.IsStageOpen(stage);
     }
 
+    private struct UiRefreshingScope : IDisposable
+    {
+        private static int _depth = 0;
+
+        public UiRefreshingScope()
+        {
+            ++_depth;
+            Instance.IsRefreshingUI = true;
+        }
+
+        void IDisposable.Dispose()
+        {
+            --_depth;
+            if (_depth == 0)
+            {
+                Instance.IsRefreshingUI = false;
+            }
+        }
+    }
+
     private interface ISerialize : ITaskQueueModelSerialize
     {
         (bool? IsSuccess, IEnumerable<int> TaskId) ITaskQueueModelSerialize.Serialize(BaseTask? baseTask, int? taskId)
@@ -929,8 +960,7 @@ public class FightSettingsUserControlModel : TaskSettingsViewModel, FightSetting
                 return (null, []);
             }
 
-            using var scope = _lock.EnterScope();
-            var stage = FightSettingsUserControlModel.GetFightStage(fight.StagePlan);
+            string? stage = GetFightStage(fight.StagePlan);
             if (stage is null)
             {
                 return (null, []);
