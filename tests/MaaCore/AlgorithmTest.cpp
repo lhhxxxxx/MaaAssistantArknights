@@ -147,6 +147,28 @@ TEST_CASE("Multiple groups can find a valid allocation")
     require_valid_allocation(groups, chars, result);
 }
 
+TEST_CASE("Multiple groups allocation ignores extra owned chars")
+{
+    const GroupList groups {
+        { "先锋", { "德克萨斯", "桃金娘" } },
+        { "术师", { "阿米娅", "伊芙利特" } },
+        { "医疗", { "闪灵", "夜莺" } },
+    };
+    const CharSet chars {
+        "桃金娘",
+        "阿米娅",
+        "夜莺",
+        "德克萨斯",
+        "伊芙利特",
+        "闪灵",
+        "能天使",
+    };
+
+    const auto result = asst::algorithm::get_char_allocation_for_each_group(groups, chars);
+
+    require_valid_allocation(groups, chars, result);
+}
+
 TEST_CASE("Group without any owned candidate returns no solution")
 {
     const GroupList groups {
@@ -154,6 +176,20 @@ TEST_CASE("Group without any owned candidate returns no solution")
         { "术师", { "阿米娅" } },
     };
     const CharSet chars { "德克萨斯" };
+
+    const auto result = asst::algorithm::get_char_allocation_for_each_group(groups, chars);
+
+    REQUIRE(result.status == asst::algorithm::CharAllocationStatus::NoSolution);
+    REQUIRE_FALSE(result.has_value());
+}
+
+TEST_CASE("Group with empty candidate list returns no solution")
+{
+    const GroupList groups {
+        { "先锋", {} },
+        { "术师", { "阿米娅" } },
+    };
+    const CharSet chars { "阿米娅" };
 
     const auto result = asst::algorithm::get_char_allocation_for_each_group(groups, chars);
 
