@@ -6,12 +6,12 @@ on:
   #     - "dev-v2"
   #   paths:
   #     - ".github/workflows/unit-tests.yml"
-  #     - "tests/**"
+  #     - "unit_test/**"
   #     - "src/**"
   # pull_request:
   #   paths:
   #     - ".github/workflows/unit-tests.yml"
-  #     - "tests/**"
+  #     - "unit_test/**"
   #     - "src/**"
   workflow_dispatch:
 
@@ -52,7 +52,7 @@ jobs:
                   return path.startswith(rule[:-3])
               return path == rule
 
-          with open('tests/test-suites.json', encoding='utf-8') as f:
+          with open('unit_test/test-suites.json', encoding='utf-8') as f:
               mapping = json.load(f)
 
           event_name = os.environ['EVENT_NAME']
@@ -111,12 +111,12 @@ jobs:
 
       - name: Configure unit tests
         run: |
-          cmake -S tests -B build/unit-tests -DCMAKE_BUILD_TYPE=Release
+          cmake -S unit_test -B build/unit_test -DCMAKE_BUILD_TYPE=Release
 
       - name: Build selected unit test target
         run: |
-          cmake --build build/unit-tests --parallel --target ${{ matrix.suite.buildTarget }}
+          cmake --build build/unit_test --parallel --target ${{ matrix.suite.buildTarget }}
 
       - name: Run selected unit tests
         run: |
-          ctest --test-dir build/unit-tests --output-on-failure -R '${{ matrix.suite.ctestRegex }}'
+          ctest --test-dir build/unit_test --output-on-failure -R '${{ matrix.suite.ctestRegex }}'

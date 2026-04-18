@@ -1,7 +1,7 @@
 {
   "runAllOnChanges": [
-    "tests/CMakeLists.txt",
-    "tests/test-suites.json",
+    "unit_test/CMakeLists.txt",
+    "unit_test/test-suites.json",
     ".github/workflows/unit-tests.yml"
   ],
   "suites": [
@@ -12,7 +12,7 @@
       "ctestRegex": "^algorithm::",
       "paths": [
         "src/MaaCore/Utils/Algorithm.hpp",
-        "tests/MaaCore/AlgorithmTest.cpp"
+        "unit_test/MaaCore/AlgorithmTest.cpp"
       ]
     }
   ]
